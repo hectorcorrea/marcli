@@ -2,11 +2,15 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+)
+
+const (
+	RecordSeparator = 0x1e
+	UnitSeparator   = 0x1f
 )
 
 func main() {
@@ -31,7 +35,7 @@ func main() {
 		}
 
 		i += 1
-		fmt.Printf("=LDR  %s\n", leader)
+		fmt.Printf("=LDR  %s (%d, %d)\n", leader, leader.Length, leader.DataOffset)
 
 		directory, err := readDirectory(f)
 		if err != nil {
@@ -47,32 +51,29 @@ func main() {
 	f.Close()
 }
 
-func readLeader(f *os.File) (string, error) {
+func readLeader(f *os.File) (Leader, error) {
 	bytes := make([]byte, 24)
-	n, err := f.Read(bytes)
+	_, err := f.Read(bytes)
 	if err != nil {
-		return "", err
+		return Leader{}, err
 	}
-	if n != 24 {
-		return "", errors.New("Incomplete leader.")
-	}
-	return string(bytes), nil
+	return NewLeader(string(bytes))
 }
 
-func readDirectory(f *os.File) ([]DirectoryEntry, error) {
+func readDirectory(f *os.File) ([]Field, error) {
 	// Source: https://www.socketloop.com/references/golang-bufio-scanrunes-function-example
 	offset := currentOffset(f)
 	reader := bufio.NewReader(f)
-	ss, err := reader.ReadString(30)
+	ss, err := reader.ReadString(RecordSeparator)
 	if err != nil {
 		return nil, err
 	}
 	count := (len(ss) - 1) / 12
-	entries := make([]DirectoryEntry, count)
+	entries := make([]Field, count)
 	for i := 0; i < count; i++ {
 		start := i * 12
 		entry := ss[start : start+12]
-		entries[i] = NewDirectoryEntryFromString(entry)
+		entries[i] = NewField(entry)
 	}
 	// ReadString leaves the file pointer a bit further than we want to.
 	// Force it to be exactly at the end of the directory.
@@ -85,7 +86,7 @@ func currentOffset(f *os.File) int64 {
 	return offset
 }
 
-func readRecord(f *os.File, entries []DirectoryEntry) {
+func readRecord(f *os.File, entries []Field) {
 	for _, entry := range entries {
 		buffer := make([]byte, entry.Length)
 		n, err := f.Read(buffer)
@@ -115,8 +116,8 @@ func formatValue(value string) string {
 	formatted += formatIndicator(value[0])
 	formatted += formatIndicator(value[1])
 	formatted += string(value[2:])
-	fd := string(byte(0x1f))
-	return strings.Replace(formatted, fd, "$", -1)
+	sep := string(byte(UnitSeparator))
+	return strings.Replace(formatted, sep, "$", -1)
 }
 
 func formatIndicator(value byte) string {
