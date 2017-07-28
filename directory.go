@@ -17,7 +17,7 @@ func NewDirectoryEntryFromString(entry string) DirectoryEntry {
   }
 
 	l, _ := strconv.Atoi(entry[3:7])
-	s, _ := strconv.Atoi(entry[8:])
+	s, _ := strconv.Atoi(entry[7:])
 	dir := DirectoryEntry{
 		Tag: entry[0:3],
 		Length: l,
