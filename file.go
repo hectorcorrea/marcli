@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -13,6 +12,10 @@ const (
 	UnitSeparator   = 0x1f
 )
 
+type RecordProcessor interface {
+	Process(Record, int)
+}
+
 type File struct {
 	Name    string
 	f       *os.File
@@ -22,6 +25,15 @@ type File struct {
 type Record struct {
 	Leader Leader
 	Fields []Field
+	Values []Value
+	Pos    int
+}
+
+type Value struct {
+	Tag   string
+	Ind1  string
+	Ind2  string
+	Value string
 }
 
 func NewFile(filename string) (File, error) {
@@ -32,14 +44,13 @@ func NewFile(filename string) (File, error) {
 	return File{Name: filename, f: f, records: 0}, nil
 }
 
-func (file *File) ReadNext() (Record, error) {
+func (file *File) ReadNext(processor func(Record)) (Record, error) {
 	leader, err := file.readLeader()
 	if err != nil {
 		return Record{}, err
 	}
 
 	file.records += 1
-	fmt.Printf("=LDR  %s (%d, %d, %d)\n", leader, file.records, leader.Length, leader.DataOffset)
 
 	directory, err := file.readDirectory()
 	if err != nil {
@@ -48,9 +59,14 @@ func (file *File) ReadNext() (Record, error) {
 	// for i, entry := range directory {
 	// 	fmt.Printf("(%d) %s\r\n", i, entry)
 	// }
-
-	file.readValues(directory)
-	fmt.Printf("\r\n\r\n")
+	values := file.readValues(directory)
+	record := Record{
+		Leader: leader,
+		Fields: directory,
+		Values: values,
+		Pos:    file.records,
+	}
+	processor(record)
 	return Record{Leader: leader, Fields: directory}, nil
 }
 
@@ -97,8 +113,9 @@ func (file *File) currentOffset() int64 {
 	return offset
 }
 
-func (file *File) readValues(entries []Field) {
-	for _, entry := range entries {
+func (file *File) readValues(entries []Field) []Value {
+	values := make([]Value, len(entries))
+	for i, entry := range entries {
 		buffer := make([]byte, entry.Length)
 		n, err := file.f.Read(buffer)
 		if err != nil && err != io.EOF {
@@ -108,7 +125,9 @@ func (file *File) readValues(entries []Field) {
 		if entry.Tag > "009" {
 			value = formatValue(value)
 		}
-		fmt.Printf("=%s  %s\r\n", entry.Tag, value)
+		values[i].Tag = entry.Tag
+		values[i].Value = value
+		// fmt.Printf("=%s  %s\r\n", entry.Tag, value)
 	}
 
 	eor := make([]byte, 1)
@@ -120,6 +139,7 @@ func (file *File) readValues(entries []Field) {
 	if err != nil {
 		panic(err)
 	}
+	return values
 }
 
 func formatValue(value string) string {

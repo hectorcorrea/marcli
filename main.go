@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 )
@@ -17,7 +18,7 @@ func main() {
 	}
 
 	for {
-		_, err := f.ReadNext()
+		_, err := f.ReadNext(PrintIt)
 		if err == io.EOF {
 			break
 		}
@@ -26,4 +27,12 @@ func main() {
 		}
 	}
 	f.Close()
+}
+
+func PrintIt(r Record) {
+	fmt.Printf("=LDR  %s (%d, %d, %d)\n", r.Leader, r.Pos, r.Leader.Length, r.Leader.DataOffset)
+	for _, v := range r.Values {
+		fmt.Printf("=%s  %s\r\n", v.Tag, v.Value)
+	}
+	fmt.Printf("\r\n\r\n")
 }
