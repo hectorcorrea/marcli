@@ -14,7 +14,7 @@ Files under `./data/` are small MARC files that I use for testing.
 * test_1b.mrc is the second record of test_10.mrc
 
 
-## Getting staertedTesting
+## Getting started
 Download the code and play with it:
 
 ```
