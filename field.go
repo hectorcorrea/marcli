@@ -6,39 +6,15 @@ import (
 	"strconv"
 )
 
-type Record struct {
-	Leader Leader
-	Fields []Field
-}
-
-type Leader struct {
-	raw        string
-	Length     int
-	DataOffset int
-}
-
 type Field struct {
 	Tag      string
 	Length   int
 	StartsAt int
 }
 
-func NewLeader(value string) (Leader, error) {
-	if len(value) != 24 {
-		return Leader{}, errors.New("Incomplete leader")
-	}
-	l, _ := strconv.Atoi(value[0:5])
-	o, _ := strconv.Atoi(value[12:17])
-	return Leader{raw: value, Length: l, DataOffset: o}, nil
-}
-
-func (l Leader) String() string {
-	return l.raw
-}
-
-func NewField(entry string) Field {
+func NewField(entry string) (Field, error) {
 	if len(entry) != 12 {
-		return Field{}
+		return Field{}, errors.New("Incomplete field definition")
 	}
 
 	l, _ := strconv.Atoi(entry[3:7])
@@ -48,7 +24,7 @@ func NewField(entry string) Field {
 		Length:   l,
 		StartsAt: s,
 	}
-	return dir
+	return dir, nil
 }
 
 func (d Field) String() string {
