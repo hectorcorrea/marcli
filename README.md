@@ -45,5 +45,19 @@ go build
 ```
 
 
+## Getting started (without the source code)
+If you don't care about the source code, you can download the binary file appropriated for your operating system from the [releases tab](https://github.com/hectorcorrea/marcli/releases) and run it.
+
+The basic syntax is:
+
+```
+./marcli -f yourfile.mrc
+```
+
+
+## Warning
+I've only tested this program with a few internal MARC files and, although they are pretty big (400MB), I have no idea how well this program works with MARC files in the wild. Please keep this in mind if you download and play with it. And feel free to let me know if you run into any issues.
+
+
 ## MARC information
 Understanding MARC: https://www.loc.gov/marc/umb/
