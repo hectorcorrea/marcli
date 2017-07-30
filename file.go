@@ -12,10 +12,6 @@ const (
 	UnitSeparator   = 0x1f
 )
 
-type RecordProcessor interface {
-	Process(Record, int)
-}
-
 type File struct {
 	Name    string
 	f       *os.File
@@ -44,7 +40,21 @@ func NewFile(filename string) (File, error) {
 	return File{Name: filename, f: f, records: 0}, nil
 }
 
-func (file *File) ReadNext(processor func(Record)) (Record, error) {
+func (file *File) ReadAll(processor func(Record)) error {
+	for {
+		_, err := file.readRecord(processor)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+	}
+	file.f.Close()
+	return nil
+}
+
+func (file *File) readRecord(processor func(Record)) (Record, error) {
 	leader, err := file.readLeader()
 	if err != nil {
 		return Record{}, err
@@ -127,7 +137,6 @@ func (file *File) readValues(entries []Field) []Value {
 		}
 		values[i].Tag = entry.Tag
 		values[i].Value = value
-		// fmt.Printf("=%s  %s\r\n", entry.Tag, value)
 	}
 
 	eor := make([]byte, 1)
