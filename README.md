@@ -13,6 +13,21 @@ Files under `./data/` are small MARC files that I use for testing.
 * test_1a.mrc is the first record of test_10.mrc
 * test_1b.mrc is the second record of test_10.mrc
 
+## Sample of usage
+
+Outputs MARC data to the console in a line delimited format:
+```
+./marcli -s data/test_1a.mrc
+```
+
+Extracts MARC records on file that match a given string
+```
+./marcli -s data/test_10.mrc -x wildlife
+```
+
+
+
+
 
 ## Getting started with the code
 Download the code and play with it:

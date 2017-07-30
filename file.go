@@ -12,6 +12,10 @@ const (
 	UnitSeparator   = 0x1f
 )
 
+type RecordProcessor interface {
+	Process(Record)
+}
+
 type File struct {
 	Name    string
 	f       *os.File
@@ -40,7 +44,7 @@ func NewFile(filename string) (File, error) {
 	return File{Name: filename, f: f, records: 0}, nil
 }
 
-func (file *File) ReadAll(processor func(Record)) error {
+func (file *File) ReadAll(processor RecordProcessor) error {
 	for {
 		_, err := file.readRecord(processor)
 		if err == io.EOF {
@@ -54,7 +58,7 @@ func (file *File) ReadAll(processor func(Record)) error {
 	return nil
 }
 
-func (file *File) readRecord(processor func(Record)) (Record, error) {
+func (file *File) readRecord(processor RecordProcessor) (Record, error) {
 	leader, err := file.readLeader()
 	if err != nil {
 		return Record{}, err
@@ -76,7 +80,7 @@ func (file *File) readRecord(processor func(Record)) (Record, error) {
 		Values: values,
 		Pos:    file.records,
 	}
-	processor(record)
+	processor.Process(record)
 	return Record{Leader: leader, Fields: directory}, nil
 }
 
