@@ -1,5 +1,5 @@
 ## What is this?
-MARC command line (marcli) This is a toy project that I am working on to help me deal with MARC files and understand better how [MARC](https://www.loc.gov/marc/umb/um01to06.html) files are stored on disk.
+MARC command line (marcli) is a toy project that I am working on to help me deal with MARC files and understand better how [MARC](https://www.loc.gov/marc/umb/um01to06.html) files are stored on disk.
 
 The basic idea is to create a program that I can run on our Linux servers to parse our very large MARC files. The goal is to be able to copy a single file to our servers to parse these MARC files, find records that match certain criteria and export them for further review.
 

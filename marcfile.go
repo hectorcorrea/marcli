@@ -16,7 +16,7 @@ type RecordProcessor interface {
 	Process(Record)
 }
 
-type File struct {
+type MarcFile struct {
 	Name    string
 	f       *os.File
 	records int
@@ -36,15 +36,15 @@ type Value struct {
 	Value string
 }
 
-func NewFile(filename string) (File, error) {
+func NewMarcFile(filename string) (MarcFile, error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		return File{}, err
+		return MarcFile{}, err
 	}
-	return File{Name: filename, f: f, records: 0}, nil
+	return MarcFile{Name: filename, f: f, records: 0}, nil
 }
 
-func (file *File) ReadAll(processor RecordProcessor) error {
+func (file *MarcFile) ReadAll(processor RecordProcessor) error {
 	for {
 		_, err := file.readRecord(processor)
 		if err == io.EOF {
@@ -58,7 +58,7 @@ func (file *File) ReadAll(processor RecordProcessor) error {
 	return nil
 }
 
-func (file *File) readRecord(processor RecordProcessor) (Record, error) {
+func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
 	leader, err := file.readLeader()
 	if err != nil {
 		return Record{}, err
@@ -84,11 +84,11 @@ func (file *File) readRecord(processor RecordProcessor) (Record, error) {
 	return Record{Leader: leader, Fields: directory}, nil
 }
 
-func (file *File) Close() {
+func (file *MarcFile) Close() {
 	file.f.Close()
 }
 
-func (file *File) readLeader() (Leader, error) {
+func (file *MarcFile) readLeader() (Leader, error) {
 	bytes := make([]byte, 24)
 	_, err := file.f.Read(bytes)
 	if err != nil {
@@ -97,7 +97,7 @@ func (file *File) readLeader() (Leader, error) {
 	return NewLeader(string(bytes))
 }
 
-func (file *File) readDirectory() ([]Field, error) {
+func (file *MarcFile) readDirectory() ([]Field, error) {
 	// Source: https://www.socketloop.com/references/golang-bufio-scanrunes-function-example
 	offset := file.currentOffset()
 	reader := bufio.NewReader(file.f)
@@ -122,12 +122,12 @@ func (file *File) readDirectory() ([]Field, error) {
 	return entries, nil
 }
 
-func (file *File) currentOffset() int64 {
+func (file *MarcFile) currentOffset() int64 {
 	offset, _ := file.f.Seek(0, 1)
 	return offset
 }
 
-func (file *File) readValues(entries []Field) []Value {
+func (file *MarcFile) readValues(entries []Field) []Value {
 	values := make([]Value, len(entries))
 	for i, entry := range entries {
 		buffer := make([]byte, entry.Length)
