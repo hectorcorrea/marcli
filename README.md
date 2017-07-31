@@ -15,14 +15,15 @@ Output MARC data to the console in a line delimited format:
 ./marcli -f data/test_1a.mrc
 ```
 
-Extract MARC records on file that match a given string
+Extract MARC records on file that contain the string "wildlife"
 ```
 ./marcli -f data/test_10.mrc -x wildlife
 ```
 
-Extracts MARC records on file that match a given string but outputs only field "650" (and the leader) for each record. [TODO: add support for multiple fields]
+Extracts MARC records on file that contain the string "wildlife" but outputs only fields "LDR,001,040,650" for each record. LDR means the leader.
+
 ```
-./marcli -f data/test_10.mrc -x wildlife -o 650
+./marcli -f data/test_10.mrc -x wildlife -o LDR,010,040,650
 ```
 
 

@@ -6,14 +6,15 @@ import (
 )
 
 type ConsoleProcessor struct {
-	Fields string
+	Fields []string
 }
 
 func (p ConsoleProcessor) Process(r Record) {
-	fmt.Printf("=LDR  %s (%d, %d, %d)\n", r.Leader, r.Pos, r.Leader.Length, r.Leader.DataOffset)
+	if outputLeader(p.Fields) {
+		fmt.Printf("=LDR  %s (%d, %d, %d)\n", r.Leader, r.Pos, r.Leader.Length, r.Leader.DataOffset)
+	}
 	for _, v := range r.Values {
-		// TODO: handle multiple comma delimited fields
-		if p.Fields == "all" || p.Fields == v.Tag {
+		if outputField(p.Fields, v.Tag) {
 			fmt.Printf("=%s  %s\r\n", v.Tag, v.Value)
 		}
 	}
@@ -21,7 +22,7 @@ func (p ConsoleProcessor) Process(r Record) {
 }
 
 type ExtractProcessor struct {
-	Fields string
+	Fields []string
 	Value  string // value to search
 }
 
@@ -35,13 +36,30 @@ func (p ExtractProcessor) Process(r Record) {
 	}
 
 	if match {
-		fmt.Printf("=LDR  %s (%d, %d, %d)\n", r.Leader, r.Pos, r.Leader.Length, r.Leader.DataOffset)
+		if outputLeader(p.Fields) {
+			fmt.Printf("=LDR  %s (%d, %d, %d)\n", r.Leader, r.Pos, r.Leader.Length, r.Leader.DataOffset)
+		}
 		for _, v := range r.Values {
-			// TODO: handle multiple comma delimited fields
-			if p.Fields == "all" || p.Fields == v.Tag {
+			if outputField(p.Fields, v.Tag) {
 				fmt.Printf("=%s  %s\r\n", v.Tag, v.Value)
 			}
 		}
 		fmt.Printf("\r\n\r\n")
 	}
+}
+
+func outputLeader(arr []string) bool {
+	return outputField(arr, "LDR")
+}
+
+func outputField(arr []string, value string) bool {
+	if len(arr) == 0 {
+		return true
+	}
+	for _, el := range arr {
+		if value == el {
+			return true
+		}
+	}
+	return false
 }

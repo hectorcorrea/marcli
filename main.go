@@ -11,7 +11,7 @@ var fileName, extract, output string
 func init() {
 	flag.StringVar(&fileName, "f", "", "MARC file to process. Required.")
 	flag.StringVar(&extract, "x", "", "Extract record where string is found (case insensitive).")
-	flag.StringVar(&output, "o", "all", "Fields to output (comma delimited).")
+	flag.StringVar(&output, "o", "", "Comma delimited list of fields to output.")
 	flag.Parse()
 }
 
@@ -27,15 +27,17 @@ func main() {
 		panic(err)
 	}
 
+	fields := strToFields(output)
+
 	var processor RecordProcessor
 	if extract != "" {
 		processor = ExtractProcessor{
-			Fields: output,
+			Fields: fields,
 			Value:  strings.ToLower(extract),
 		}
 	} else {
 		processor = ConsoleProcessor{
-			Fields: output,
+			Fields: fields,
 		}
 	}
 
@@ -43,4 +45,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func strToFields(str string) []string {
+	if str == "" {
+		return []string{}
+	}
+	values := strings.Split(str, ",")
+	return values
 }
