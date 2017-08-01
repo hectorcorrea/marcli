@@ -17,7 +17,7 @@ func init() {
 
 func main() {
 	if fileName == "" {
-		fmt.Printf("marcli syntax:\r\n")
+		fmt.Printf("marcli parameters:\r\n")
 		flag.PrintDefaults()
 		return
 	}
@@ -27,17 +27,16 @@ func main() {
 		panic(err)
 	}
 
-	fields := strToFields(output)
-
+	filters := NewFieldFilters(output)
 	var processor RecordProcessor
 	if extract != "" {
 		processor = ExtractProcessor{
-			Fields: fields,
-			Value:  strings.ToLower(extract),
+			Filters: filters,
+			Value:   strings.ToLower(extract),
 		}
 	} else {
 		processor = ConsoleProcessor{
-			Fields: fields,
+			Filters: filters,
 		}
 	}
 
@@ -45,12 +44,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func strToFields(str string) []string {
-	if str == "" {
-		return []string{}
-	}
-	values := strings.Split(str, ",")
-	return values
 }

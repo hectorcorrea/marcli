@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -21,5 +22,5 @@ func NewLeader(value string) (Leader, error) {
 }
 
 func (l Leader) String() string {
-	return l.raw
+	return fmt.Sprintf("=LDR  %s", l.raw)
 }

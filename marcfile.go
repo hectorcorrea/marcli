@@ -29,13 +29,6 @@ type Record struct {
 	Pos    int
 }
 
-type Value struct {
-	Tag   string
-	Ind1  string
-	Ind2  string
-	Value string
-}
-
 func NewMarcFile(filename string) (MarcFile, error) {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -70,9 +63,6 @@ func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
 	if err != nil {
 		panic(err)
 	}
-	// for i, entry := range directory {
-	// 	fmt.Printf("(%d) %s\r\n", i, entry)
-	// }
 	values := file.readValues(directory)
 	record := Record{
 		Leader: leader,
@@ -136,11 +126,11 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 			panic(err)
 		}
 		value := string(buffer[:n])
-		if entry.Tag > "009" {
-			value = formatValue(value)
-		}
 		values[i].Tag = entry.Tag
-		values[i].Value = value
+		values[i].RawValue = value
+		if entry.Tag > "009" {
+			values[i].SubFieldValues = parseSubFieldValues(value)
+		}
 	}
 
 	eor := make([]byte, 1)
@@ -155,18 +145,19 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 	return values
 }
 
-func formatValue(value string) string {
-	formatted := ""
-	formatted += formatIndicator(value[0])
-	formatted += formatIndicator(value[1])
-	formatted += string(value[2:])
-	sep := string(byte(UnitSeparator))
-	return strings.Replace(formatted, sep, "$", -1)
-}
-
-func formatIndicator(value byte) string {
-	if value == ' ' {
-		return "\\"
+func parseSubFieldValues(valueStr string) []SubFieldValue {
+	var values []SubFieldValue
+	// valueStr comes with the indicators, we skip them:
+	//   value[0] indicator 1
+	// 	 value[0] indicator 2
+	// 	 value[0] separator (ascii 31)
+	tokens := strings.Split(valueStr[3:], string(UnitSeparator))
+	for _, token := range tokens {
+		value := SubFieldValue{
+			SubField: string(token[0]),
+			Value:    token[1:],
+		}
+		values = append(values, value)
 	}
-	return string(value)
+	return values
 }
