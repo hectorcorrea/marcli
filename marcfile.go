@@ -8,7 +8,6 @@ import (
 
 const (
 	RecordSeparator = 0x1e
-	UnitSeparator   = 0x1f
 )
 
 type RecordProcessor interface {
