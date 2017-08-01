@@ -51,7 +51,7 @@ func NewValue(tag, valueStr string) Value {
 
 	if len(valueStr) > 2 {
 		// notice that we skip the indicators because they are handled above
-		// and valueStr[2] since that's a separator
+		// and valueStr[2] because that's a separator character
 		value.RawValue = valueStr[3:]
 	}
 

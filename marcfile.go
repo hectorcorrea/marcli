@@ -6,10 +6,6 @@ import (
 	"os"
 )
 
-const (
-	RecordSeparator = 0x1e
-)
-
 type RecordProcessor interface {
 	Process(Record)
 }
@@ -86,6 +82,8 @@ func (file *MarcFile) readLeader() (Leader, error) {
 }
 
 func (file *MarcFile) readDirectory() ([]Field, error) {
+	const RecordSeparator = 0x1e
+
 	// Source: https://www.socketloop.com/references/golang-bufio-scanrunes-function-example
 	offset := file.currentOffset()
 	reader := bufio.NewReader(file.f)
