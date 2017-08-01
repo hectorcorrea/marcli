@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"os"
-	"strings"
 )
 
 const (
@@ -131,7 +130,7 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 		values[i].Tag = entry.Tag
 		values[i].RawValue = value
 		if entry.Tag > "009" {
-			values[i].SubFieldValues = parseSubFieldValues(value)
+			values[i].SubFieldValues = NewFieldsFromString(value)
 		}
 	}
 
@@ -143,23 +142,6 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 
 	if err != nil {
 		panic(err)
-	}
-	return values
-}
-
-func parseSubFieldValues(valueStr string) []SubFieldValue {
-	var values []SubFieldValue
-	// valueStr comes with the indicators, we skip them:
-	//   value[0] indicator 1
-	// 	 value[0] indicator 2
-	// 	 value[0] separator (ascii 31)
-	tokens := strings.Split(valueStr[3:], string(UnitSeparator))
-	for _, token := range tokens {
-		value := SubFieldValue{
-			SubField: string(token[0]),
-			Value:    token[1:],
-		}
-		values = append(values, value)
 	}
 	return values
 }
