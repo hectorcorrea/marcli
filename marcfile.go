@@ -126,6 +126,8 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 			panic(err)
 		}
 		value := string(buffer[:n])
+		// TODO: NewValueFromRaw(value) for <= "009"
+		//  and NewValueFromSubfields(value) for all others
 		values[i].Tag = entry.Tag
 		values[i].RawValue = value
 		if entry.Tag > "009" {

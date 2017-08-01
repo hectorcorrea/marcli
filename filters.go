@@ -70,7 +70,30 @@ func (filters FieldFilters) Apply(values []Value) []Value {
 	for _, field := range filters.Fields {
 		for _, value := range values {
 			if value.Tag == field.Tag {
-				filtered = append(filtered, value)
+				// tag in value exists in filters...
+				if len(field.Subfields) == 0 {
+					// ...and there is no need to filter by subfield
+					filtered = append(filtered, value)
+				} else {
+					//... filter by subfield
+					// TODO == THIS ENTIRE LOOP SHOULD BE REFACTORED ==
+					newValue := value
+					newValue.RawValue = ""
+					var newValues []SubFieldValue
+					for _, sv := range value.SubFieldValues {
+						if strings.Contains(field.Subfields, sv.SubField) {
+							yy := SubFieldValue{
+								SubField: sv.SubField,
+								Value:    sv.Value,
+							}
+							// fmt.Printf("field: %s, subfield: %s, value: %s\r\n",
+							// 	field.Tag, yy.SubField, yy.Value)
+							newValues = append(newValues, yy)
+						}
+					}
+					newValue.SubFieldValues = newValues
+					filtered = append(filtered, newValue)
+				}
 			}
 		}
 	}
