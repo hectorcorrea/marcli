@@ -62,42 +62,59 @@ func (filters *FieldFilters) addFilter(fieldStr string) error {
 	return nil
 }
 
+// For a given list of values, it returns only those values
+// match the filters. The filter is done by Tag and if
+// available by Sub Field.
 func (filters FieldFilters) Apply(values []Value) []Value {
 	if len(filters.Fields) == 0 {
 		return values
 	}
+
 	var filtered []Value
 	for _, field := range filters.Fields {
-		for _, value := range values {
-			if value.Tag == field.Tag {
-				// tag in value exists in filters...
-				if len(field.Subfields) == 0 {
-					// ...and there is no need to filter by subfield
-					filtered = append(filtered, value)
-				} else {
-					//... filter by subfield
-					// TODO == THIS ENTIRE LOOP SHOULD BE REFACTORED ==
-					newValue := value
-					newValue.RawValue = ""
-					var newValues []SubFieldValue
-					for _, sv := range value.SubFieldValues {
-						if strings.Contains(field.Subfields, sv.SubField) {
-							yy := SubFieldValue{
-								SubField: sv.SubField,
-								Value:    sv.Value,
-							}
-							// fmt.Printf("field: %s, subfield: %s, value: %s\r\n",
-							// 	field.Tag, yy.SubField, yy.Value)
-							newValues = append(newValues, yy)
-						}
-					}
-					newValue.SubFieldValues = newValues
-					filtered = append(filtered, newValue)
-				}
+		// Process all the values that match the tag
+		// (there could be more than one)
+		for _, value := range valuesForTag(values, field.Tag) {
+			if len(field.Subfields) == 0 {
+				// add the value as-is, no need to filter by subfield
+				filtered = append(filtered, value)
+			} else {
+				//... filter the value by subfield
+				newValue := value
+				newValue.RawValue = ""
+				newValue.SubFieldValues = subFieldValuesFromValue(value, field.Subfields)
+				filtered = append(filtered, newValue)
 			}
 		}
 	}
 	return filtered
+}
+
+// For a given value, extract the subfield values in the string
+// indicated. "subfields" is a plain string, like "abu", to
+// indicate subfields a, b, and u.
+func subFieldValuesFromValue(value Value, subfields string) []SubFieldValue {
+	var newValues []SubFieldValue
+	for _, sv := range value.SubFieldValues {
+		if strings.Contains(subfields, sv.SubField) {
+			yy := SubFieldValue{
+				SubField: sv.SubField,
+				Value:    sv.Value,
+			}
+			newValues = append(newValues, yy)
+		}
+	}
+	return newValues
+}
+
+func valuesForTag(values []Value, tag string) []Value {
+	var vv []Value
+	for _, value := range values {
+		if value.Tag == tag {
+			vv = append(vv, value)
+		}
+	}
+	return vv
 }
 
 func (filters FieldFilters) IncludeLeader() bool {
