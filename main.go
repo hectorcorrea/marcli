@@ -6,16 +6,18 @@ import (
 	"strings"
 )
 
-var fileName, search, output string
+var fileName, search, fields, format string
 
 func init() {
-	flag.StringVar(&fileName, "f", "", "MARC file to process. Required.")
+	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
 	flag.StringVar(&search, "m", "", "Only records that match the string passed (case insensitive).")
-	flag.StringVar(&output, "o", "", "Comma delimited list of fields to output.")
+	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
+	flag.StringVar(&format, "format", "MRK", "Output format (defaults to MRK).")
 	flag.Parse()
 }
 
 func main() {
+
 	if fileName == "" {
 		fmt.Printf("marcli parameters:\r\n")
 		flag.PrintDefaults()
@@ -28,11 +30,12 @@ func main() {
 	}
 
 	processor := ConsoleProcessor{
-		Filters:     NewFieldFilters(output),
+		Filters:     NewFieldFilters(fields),
 		SearchValue: strings.ToLower(search),
+		Format:      format,
 	}
 
-	err = file.ReadAll(processor)
+	err = file.ReadAll(&processor)
 	if err != nil {
 		panic(err)
 	}

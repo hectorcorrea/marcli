@@ -8,6 +8,8 @@ import (
 
 type RecordProcessor interface {
 	Process(Record)
+	Header() // these shouldn't be a the record level or we could
+	Footer() // rename RecordProcessor to something else?
 }
 
 type MarcFile struct {
@@ -32,6 +34,7 @@ func NewMarcFile(filename string) (MarcFile, error) {
 }
 
 func (file *MarcFile) ReadAll(processor RecordProcessor) error {
+	processor.Header()
 	for {
 		_, err := file.readRecord(processor)
 		if err == io.EOF {
@@ -42,6 +45,7 @@ func (file *MarcFile) ReadAll(processor RecordProcessor) error {
 		}
 	}
 	file.f.Close()
+	processor.Footer()
 	return nil
 }
 
