@@ -12,18 +12,18 @@ The code is written in Go. I've found Go a very interesting and powerful program
 
 Output MARC data to the console in a line delimited format:
 ```
-./marcli -f data/test_1a.mrc
+./marcli -file data/test_1a.mrc
 ```
 
 Extract MARC records on file that contain the string "wildlife"
 ```
-./marcli -f data/test_10.mrc -x wildlife
+./marcli -file data/test_10.mrc -match wildlife
 ```
 
 Extracts MARC records on file that contain the string "wildlife" but outputs only fields "LDR,001,040,650" for each record. LDR means the leader.
 
 ```
-./marcli -f data/test_10.mrc -x wildlife -o LDR,010,040,650
+./marcli -file data/test_10.mrc -match wildlife -fields LDR,010,040,650
 ```
 
 
@@ -52,7 +52,7 @@ If you don't care about the source code, you can download the binary file approp
 The basic syntax is:
 
 ```
-./marcli -f yourfile.mrc
+./marcli -file yourfile.mrc
 ```
 
 
