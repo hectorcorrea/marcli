@@ -125,7 +125,7 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 		if err != nil && err != io.EOF {
 			panic(err)
 		}
-		value := string(buffer[:n])
+		value := string(buffer[:n-1]) // -1 to exclude the record separator character (0x1e)
 		values[i] = NewValue(entry.Tag, value)
 	}
 
