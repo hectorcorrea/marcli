@@ -141,6 +141,16 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 	return values
 }
 
+func (r Record) ValuesFor(tag string) []Value {
+	var values []Value
+	for _, value := range r.Values {
+		if value.Tag == tag {
+			values = append(values, value)
+		}
+	}
+	return values
+}
+
 func (r Record) ValueFor(tag string) (bool, Value) {
 	for _, value := range r.Values {
 		if value.Tag == tag {

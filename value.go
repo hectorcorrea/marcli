@@ -95,6 +95,15 @@ func (v Value) String() string {
 	return fmt.Sprintf("=%s  %s%s%s", v.Tag, ind1, ind2, strValue)
 }
 
+func (v Value) SubFieldValue(search string) string {
+	for _, subfield := range v.SubFieldValues {
+		if subfield.SubField == search {
+			return subfield.Value
+		}
+	}
+	return ""
+}
+
 func formatIndicator(value string) string {
 	if value == " " {
 		return "\\"
