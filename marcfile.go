@@ -140,3 +140,26 @@ func (file *MarcFile) readValues(entries []Field) []Value {
 	}
 	return values
 }
+
+func (r Record) ValueFor(tag string) (bool, Value) {
+	for _, value := range r.Values {
+		if value.Tag == tag {
+			return true, value
+		}
+	}
+	return false, Value{}
+}
+
+func (r Record) SubValueFor(tag string, subfield string) string {
+	subValue := ""
+	found, value := r.ValueFor(tag)
+	if found {
+		for _, sub := range value.SubFieldValues {
+			if sub.SubField == subfield {
+				subValue = sub.Value
+				break
+			}
+		}
+	}
+	return subValue
+}

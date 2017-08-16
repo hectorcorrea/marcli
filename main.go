@@ -31,11 +31,7 @@ func main() {
 
 	var processor RecordProcessor
 	if format == "brown" {
-		processor = BrownProcessor{
-			Filters:     NewFieldFilters(fields),
-			SearchValue: strings.ToLower(search),
-			Format:      "", // not used
-		}
+		processor = BrownProcessor{}
 	} else {
 		processor = ConsoleProcessor{
 			Filters:     NewFieldFilters(fields),
