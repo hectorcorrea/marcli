@@ -7,7 +7,7 @@ import (
 )
 
 type RecordProcessor interface {
-	Process(Record)
+	Process(Record, string)
 	Header() // these shouldn't be a the record level or we could
 	Footer() // rename RecordProcessor to something else?
 }
@@ -68,7 +68,7 @@ func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
 		Values: values,
 		Pos:    file.records,
 	}
-	processor.Process(record)
+	processor.Process(record, file.Name)
 	return Record{Leader: leader, Fields: directory}, nil
 }
 

@@ -42,7 +42,7 @@ Download the code and play with it:
 git clone https://github.com/hectorcorrea/marcli.git
 cd marcli
 go build
-./marcli -f data/test_1a.mrc  
+./marcli -file data/test_1a.mrc  
 ```
 
 

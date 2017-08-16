@@ -25,15 +25,15 @@ func (p ConsoleProcessor) Footer() {
 	}
 }
 
-func (p *ConsoleProcessor) Process(r Record) {
+func (p *ConsoleProcessor) Process(r Record, filename string) {
 	if !p.isMatch(r) {
 		return
 	}
 	p.outputCount += 1
 	if p.Format == "json" {
-		p.outputJson(r)
+		p.outputJson(r, filename)
 	} else {
-		p.outputMrk(r)
+		p.outputMrk(r, filename)
 	}
 }
 
@@ -49,9 +49,15 @@ func (p ConsoleProcessor) isMatch(r Record) bool {
 	return false
 }
 
-func (p ConsoleProcessor) outputMrk(r Record) {
+func (p ConsoleProcessor) outputMrk(r Record, filename string) {
 	if p.Filters.IncludeLeader() {
-		fmt.Printf("%s (%d, %d, %d)\r\n", r.Leader, r.Pos, r.Leader.Length, r.Leader.DataOffset)
+		fmt.Printf("%s\r\n", r.Leader)
+	}
+	if p.Filters.IncludeRecordInfo() {
+		fmt.Printf("=RIN  pos=%d, length=%d, data offset=%d\r\n", r.Pos, r.Leader.Length, r.Leader.DataOffset)
+	}
+	if p.Filters.IncludeFileInfo() {
+		fmt.Printf("=FIN  %s\r\n", filename)
 	}
 	for _, value := range p.Filters.Apply(r.Values) {
 		fmt.Printf("%s\r\n", value)
@@ -59,10 +65,12 @@ func (p ConsoleProcessor) outputMrk(r Record) {
 	fmt.Printf("\r\n")
 }
 
-func (p ConsoleProcessor) outputJson(r Record) {
+func (p ConsoleProcessor) outputJson(r Record, filename string) {
 	if p.outputCount > 1 {
 		fmt.Printf(", \r\n")
 	}
+
+	// TODO: Handle Leader, RecordInfo, and FileInfo fields
 
 	// Create a copy of the record but only with the
 	// values indicated in the filters.

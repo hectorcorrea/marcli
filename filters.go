@@ -117,14 +117,27 @@ func valuesForTag(values []Value, tag string) []Value {
 	return vv
 }
 
-func (filters FieldFilters) IncludeLeader() bool {
-	if len(filters.Fields) == 0 {
-		return true
-	}
+func (filters FieldFilters) includeField(name string) bool {
 	for _, field := range filters.Fields {
-		if field.Tag == "LDR" {
+		if field.Tag == name {
 			return true
 		}
 	}
 	return false
+}
+
+func (filters FieldFilters) IncludeLeader() bool {
+	if len(filters.Fields) == 0 {
+		// included by default because it is part of the MARC data
+		return true
+	}
+	return filters.includeField("LDR")
+}
+
+func (filters FieldFilters) IncludeFileInfo() bool {
+	return filters.includeField("FIN")
+}
+
+func (filters FieldFilters) IncludeRecordInfo() bool {
+	return filters.includeField("RIN")
 }
