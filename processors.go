@@ -71,15 +71,10 @@ func (p ConsoleProcessor) outputJson(r Record, filename string) {
 	}
 
 	// TODO: Handle Leader, RecordInfo, and FileInfo fields
-
-	// Create a copy of the record but only with the
-	// values indicated in the filters.
-	rr := r
-	rr.Values = p.Filters.Apply(r.Values)
-
-	b, err := json.Marshal(rr)
+	output := p.Filters.Apply(r.Values)
+	b, err := json.Marshal(output)
 	if err != nil {
 		fmt.Printf("%s\r\n", err)
 	}
-	fmt.Printf("%s\r\n", b)
+	fmt.Printf("{ \"record\": %s}\r\n", b)
 }
