@@ -25,15 +25,15 @@ func (p ConsoleProcessor) Footer() {
 	}
 }
 
-func (p *ConsoleProcessor) Process(r Record, filename string) {
+func (p ConsoleProcessor) Process(f *MarcFile, r Record, count int) {
 	if !p.isMatch(r) {
 		return
 	}
-	p.outputCount += 1
+	p.outputCount = count
 	if p.Format == "json" {
-		p.outputJson(r, filename)
+		p.outputJson(r, f.Name)
 	} else {
-		p.outputMrk(r, filename)
+		p.outputMrk(r, f.Name)
 	}
 }
 

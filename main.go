@@ -29,13 +29,22 @@ func main() {
 		panic(err)
 	}
 
-	processor := ConsoleProcessor{
-		Filters:     NewFieldFilters(fields),
-		SearchValue: strings.ToLower(search),
-		Format:      format,
+	var processor RecordProcessor
+	if format == "brown" {
+		processor = BrownProcessor{
+			Filters:     NewFieldFilters(fields),
+			SearchValue: strings.ToLower(search),
+			Format:      "", // not used
+		}
+	} else {
+		processor = ConsoleProcessor{
+			Filters:     NewFieldFilters(fields),
+			SearchValue: strings.ToLower(search),
+			Format:      format,
+		}
 	}
+	err = file.ReadAll(processor)
 
-	err = file.ReadAll(&processor)
 	if err != nil {
 		panic(err)
 	}
