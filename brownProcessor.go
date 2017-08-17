@@ -8,21 +8,26 @@ type BrownProcessor struct {
 }
 
 type BrownRecord struct {
-	Bib         string
-	Title       string
-	Callnumbers []string
+	Bib   string
+	Title string
+	Items []BrownItem
+}
+
+type BrownItem struct {
+	Callnumber string
+	Barcode    string
 }
 
 func NewBrownRecord(r Record) BrownRecord {
 	b := BrownRecord{}
 	b.Bib = bib(r)
 	b.Title = pad(r.SubValueFor("245", "a"))
-	b.Callnumbers = callnumbers(r)
+	b.Items = items(r)
 	return b
 }
 
 func (p BrownProcessor) Header() {
-	fmt.Printf("BIB\tTitle\tCallnumber\r\n")
+	fmt.Printf("BIB\tTitle\tCallnumber\tBarcode\r\n")
 }
 
 func (p BrownProcessor) Footer() {
@@ -30,11 +35,11 @@ func (p BrownProcessor) Footer() {
 
 func (p BrownProcessor) Process(f *MarcFile, r Record, count int) {
 	b := NewBrownRecord(r)
-	if len(b.Callnumbers) == 0 {
+	if len(b.Items) == 0 {
 		// fmt.Printf("%s\t%s\t%s\r\n", b.Bib, b.Title, "--")
 	} else {
-		for _, callnumber := range b.Callnumbers {
-			fmt.Printf("%s\t%s\t%s\r\n", b.Bib, b.Title, callnumber)
+		for _, item := range b.Items {
+			fmt.Printf("%s\t%s\t%s\t%s\r\n", b.Bib, b.Title, item.Callnumber, item.Barcode)
 		}
 	}
 }
@@ -84,6 +89,44 @@ func callnumbers(r Record) []string {
 		numbers = append(numbers, number)
 	}
 	return numbers
+}
+
+func items(r Record) []BrownItem {
+	var items []BrownItem
+
+	marcItems := r.ValuesFor("945")
+	if len(marcItems) == 0 {
+		return items
+	}
+
+	if found, _ := r.ValueFor("090"); !found {
+		// TODO: handle other 09X fields
+		return items
+	}
+
+	f_090a := r.SubValueFor("090", "a")
+	f_090b := r.SubValueFor("090", "b")
+	f_090f := r.SubValueFor("090", "f") // 1-SIZE
+
+	// get the call numbers from the items
+	for _, f_945 := range marcItems {
+		barcode := f_945.SubFieldValue("i")
+		base := concat(f_090f, f_090a, f_090b)
+		f_945a := f_945.SubFieldValue("a")
+		if f_945a != "" {
+			// Annex Hay items
+			base = concat(f_090f, f_945a, "")
+		}
+		c := f_945.SubFieldValue("c") // volume
+		g := f_945.SubFieldValue("g") // copy
+		if g == "1" {
+			g = ""
+		}
+		number := concat(base, c, g)
+		item := BrownItem{Callnumber: number, Barcode: barcode}
+		items = append(items, item)
+	}
+	return items
 }
 
 func pad(str string) string {
