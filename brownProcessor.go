@@ -52,43 +52,33 @@ func bib(r Record) string {
 	return bib
 }
 
-func callnumbers(r Record) []string {
-	var numbers []string
-
-	if found, _ := r.ValueFor("090"); !found {
-		// TODO: handle other 09X fields
-		return numbers
+func baseCallNumber(r Record) (bool, Value) {
+	// 090 ab            LC CALL NO(c)
+	if found, value := r.ValueFor("090"); found {
+		return true, value
 	}
 
-	f_090a := r.SubValueFor("090", "a")
-	f_090b := r.SubValueFor("090", "b")
-	f_090f := r.SubValueFor("090", "f") // 1-SIZE
-	items := r.ValuesFor("945")
-	if len(items) == 0 {
-		// no items, use the bib call number
-		// TODO: do we want this?
-		number := concat(f_090f, f_090a, f_090b)
-		numbers = append(numbers, number)
-		return numbers
+	// 091 ab            HARRIS CALL NO(e)
+	if found, value := r.ValueFor("091"); found {
+		return true, value
 	}
 
-	// get the call numbers from the items
-	for _, f_945 := range items {
-		base := concat(f_090f, f_090a, f_090b)
-		f_945a := f_945.SubFieldValue("a")
-		if f_945a != "" {
-			// Annex Hay items
-			base = concat(f_090f, f_945a, "")
-		}
-		c := f_945.SubFieldValue("c") // volume
-		g := f_945.SubFieldValue("g") // copy
-		if g == "1" {
-			g = ""
-		}
-		number := concat(base, c, g)
-		numbers = append(numbers, number)
+	// 092 ab            JCB CALL NO(f)
+	if found, value := r.ValueFor("092"); found {
+		return true, value
 	}
-	return numbers
+
+	// 096 ab           SUDOCS CALL NO(v)
+	if found, value := r.ValueFor("096"); found {
+		return true, value
+	}
+
+	// 099 ab            OTHER BROWN CALL (l)
+	if found, value := r.ValueFor("099"); found {
+		return true, value
+	}
+
+	return false, Value{}
 }
 
 func items(r Record) []BrownItem {
@@ -99,28 +89,32 @@ func items(r Record) []BrownItem {
 		return items
 	}
 
-	if found, _ := r.ValueFor("090"); !found {
-		// TODO: handle other 09X fields
+	// Base call number from the 09X field
+	found, f_090 := baseCallNumber(r)
+	if !found {
 		return items
 	}
 
-	f_090a := r.SubValueFor("090", "a")
-	f_090b := r.SubValueFor("090", "b")
-	f_090f := r.SubValueFor("090", "f") // 1-SIZE
+	f_090a := f_090.SubFieldValue("a")
+	f_090b := f_090.SubFieldValue("b")
+	f_090f := f_090.SubFieldValue("f") // 1-SIZE
 
 	// get the call numbers from the items
 	for _, f_945 := range marcItems {
 		barcode := f_945.SubFieldValue("i")
 		base := concat(f_090f, f_090a, f_090b)
 		f_945a := f_945.SubFieldValue("a")
+		f_945b := f_945.SubFieldValue("b")
 		if f_945a != "" {
-			// Annex Hay items
-			base = concat(f_090f, f_945a, "")
+			// use the values in the item record
+			base = concat(f_090f, f_945a, f_945b)
 		}
 		c := f_945.SubFieldValue("c") // volume
 		g := f_945.SubFieldValue("g") // copy
 		if g == "1" {
 			g = ""
+		} else if g > "1" {
+			g = "c. " + g
 		}
 		number := concat(base, c, g)
 		item := BrownItem{Callnumber: number, Barcode: barcode}
