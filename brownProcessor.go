@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 type BrownProcessor struct {
+	SearchValue string
 }
 
 type BrownRecord struct {
@@ -34,6 +36,9 @@ func (p BrownProcessor) Footer() {
 }
 
 func (p BrownProcessor) Process(f *MarcFile, r Record, count int) {
+	if !p.isMatch(r) {
+		return
+	}
 	b := NewBrownRecord(r)
 	if len(b.Items) == 0 {
 		// fmt.Printf("%s\t%s\t%s\r\n", b.Bib, b.Title, "--")
@@ -42,6 +47,18 @@ func (p BrownProcessor) Process(f *MarcFile, r Record, count int) {
 			fmt.Printf("%s\t%s\t%s\t%s\r\n", b.Bib, b.Title, item.Callnumber, item.Barcode)
 		}
 	}
+}
+
+func (p BrownProcessor) isMatch(r Record) bool {
+	if p.SearchValue == "" {
+		return true
+	}
+	for _, v := range r.Values {
+		if strings.Contains(strings.ToLower(v.RawValue), p.SearchValue) {
+			return true
+		}
+	}
+	return false
 }
 
 func bib(r Record) string {
@@ -101,7 +118,7 @@ func items(r Record) []BrownItem {
 
 	// get the call numbers from the items
 	for _, f_945 := range marcItems {
-		barcode := f_945.SubFieldValue("i")
+		barcode := removeSpaces(f_945.SubFieldValue("i"))
 		base := concat(f_090f, f_090a, f_090b)
 		f_945a := f_945.SubFieldValue("a")
 		f_945b := f_945.SubFieldValue("b")
@@ -151,4 +168,8 @@ func concat(a, b, c string) string {
 		str += c
 	}
 	return str
+}
+
+func removeSpaces(s string) string {
+	return strings.Replace(s, " ", "", -1)
 }
