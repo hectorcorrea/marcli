@@ -117,7 +117,7 @@ func valuesForTag(values []Value, tag string) []Value {
 	return vv
 }
 
-func (filters FieldFilters) includeField(name string) bool {
+func (filters FieldFilters) IncludeField(name string) bool {
 	for _, field := range filters.Fields {
 		if field.Tag == name {
 			return true
@@ -131,13 +131,13 @@ func (filters FieldFilters) IncludeLeader() bool {
 		// included by default because it is part of the MARC data
 		return true
 	}
-	return filters.includeField("LDR")
+	return filters.IncludeField("LDR")
 }
 
 func (filters FieldFilters) IncludeFileInfo() bool {
-	return filters.includeField("FIN")
+	return filters.IncludeField("FIN")
 }
 
 func (filters FieldFilters) IncludeRecordInfo() bool {
-	return filters.includeField("RIN")
+	return filters.IncludeField("RIN")
 }

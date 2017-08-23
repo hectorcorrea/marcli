@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-type BrownProcessor struct {
+type ProcessorBrown struct {
+	Filters     FieldFilters
 	SearchValue string
 }
 
@@ -28,14 +29,20 @@ func NewBrownRecord(r Record) BrownRecord {
 	return b
 }
 
-func (p BrownProcessor) Header() {
-	fmt.Printf("BIB\tTitle\tCallnumber\tBarcode\r\n")
+func (p ProcessorBrown) Header() {
+	header := ""
+	if len(p.Filters.Fields) == 0 {
+		header = "bib\ttitle\tcallnumber\tbarcode"
+	} else {
+		header = p.outputString("bib", "title", "callnumber", "barcode")
+	}
+	fmt.Printf("%s\r\n", header)
 }
 
-func (p BrownProcessor) Footer() {
+func (p ProcessorBrown) Footer() {
 }
 
-func (p BrownProcessor) Process(f *MarcFile, r Record, count int) {
+func (p ProcessorBrown) Process(f *MarcFile, r Record, count int) {
 	if !p.isMatch(r) {
 		return
 	}
@@ -44,12 +51,31 @@ func (p BrownProcessor) Process(f *MarcFile, r Record, count int) {
 		// fmt.Printf("%s\t%s\t%s\r\n", b.Bib, b.Title, "--")
 	} else {
 		for _, item := range b.Items {
-			fmt.Printf("%s\t%s\t%s\t%s\r\n", b.Bib, b.Title, item.Callnumber, item.Barcode)
+			output := p.outputString(b.Bib, b.Title, item.Callnumber, item.Barcode)
+			fmt.Printf("%s\r\n", output)
 		}
 	}
 }
 
-func (p BrownProcessor) isMatch(r Record) bool {
+func (p ProcessorBrown) outputString(bib, title, callnumber, barcode string) string {
+	output := ""
+	allFields := len(p.Filters.Fields) == 0
+	if allFields || p.Filters.IncludeField("bib") {
+		output = bib
+	}
+	if allFields || p.Filters.IncludeField("tit") {
+		output = concatTab(output, pad(title))
+	}
+	if allFields || p.Filters.IncludeField("cal") {
+		output = concatTab(output, callnumber)
+	}
+	if allFields || p.Filters.IncludeField("bar") {
+		output = concatTab(output, barcode)
+	}
+	return output
+}
+
+func (p ProcessorBrown) isMatch(r Record) bool {
 	if p.SearchValue == "" {
 		return true
 	}
@@ -128,21 +154,21 @@ func items(r Record) []BrownItem {
 	// get the call numbers from the items
 	for _, f_945 := range marcItems {
 		barcode := barcode(f_945)
-		base := concat(f_090f, f_090a, f_090b)
+		base := concat3(f_090f, f_090a, f_090b)
 		f_945a := f_945.SubFieldValue("a")
 		f_945b := f_945.SubFieldValue("b")
 		if f_945a != "" {
 			// use the values in the item record
-			base = concat(f_090f, f_945a, f_945b)
+			base = concat3(f_090f, f_945a, f_945b)
 		}
-		c := f_945.SubFieldValue("c") // volume
-		g := f_945.SubFieldValue("g") // copy
-		if g == "1" {
-			g = ""
-		} else if g > "1" {
-			g = "c. " + g
+		volume := f_945.SubFieldValue("c")
+		copy := f_945.SubFieldValue("g")
+		if copy == "1" {
+			copy = ""
+		} else if copy > "1" {
+			copy = "c. " + copy
 		}
-		number := concat(base, c, g)
+		number := concat3(base, volume, copy)
 		item := BrownItem{Callnumber: number, Barcode: barcode}
 		items = append(items, item)
 	}
@@ -150,33 +176,33 @@ func items(r Record) []BrownItem {
 }
 
 func pad(str string) string {
-	padded := fmt.Sprintf("%-40s", str)
-	if len(padded) > 40 {
-		return padded[0:40]
+	if len(str) > 40 {
+		return str[0:40]
 	}
-	return padded
+	return fmt.Sprintf("%-40s", str)
 }
 
-func concat(a, b, c string) string {
-	str := ""
-	if a != "" {
-		str += a
-	}
+func concat(a, b string) string {
+	return _concat(a, b, " ")
+}
 
-	if b != "" {
-		if len(str) > 0 {
-			str += " "
-		}
-		str += b
-	}
+func concatTab(a, b string) string {
+	return _concat(a, b, "\t")
+}
 
-	if c != "" {
-		if len(str) > 0 {
-			str += " "
-		}
-		str += c
+func _concat(a, b, sep string) string {
+	if a == "" && b == "" {
+		return ""
+	} else if a == "" && b != "" {
+		return b
+	} else if a != "" && b == "" {
+		return a
 	}
-	return str
+	return a + sep + b
+}
+
+func concat3(a, b, c string) string {
+	return concat(concat(a, b), c)
 }
 
 func removeSpaces(s string) string {
