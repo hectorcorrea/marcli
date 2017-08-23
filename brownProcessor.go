@@ -98,6 +98,15 @@ func baseCallNumber(r Record) (bool, Value) {
 	return false, Value{}
 }
 
+func barcode(f Value) string {
+	barcode := f.SubFieldValue("i")
+	barcode = removeSpaces(barcode)
+	if barcode == "" {
+		return "N/A"
+	}
+	return barcode
+}
+
 func items(r Record) []BrownItem {
 	var items []BrownItem
 
@@ -118,7 +127,7 @@ func items(r Record) []BrownItem {
 
 	// get the call numbers from the items
 	for _, f_945 := range marcItems {
-		barcode := removeSpaces(f_945.SubFieldValue("i"))
+		barcode := barcode(f_945)
 		base := concat(f_090f, f_090a, f_090b)
 		f_945a := f_945.SubFieldValue("a")
 		f_945b := f_945.SubFieldValue("b")
