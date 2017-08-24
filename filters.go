@@ -62,19 +62,19 @@ func (filters *FieldFilters) addFilter(fieldStr string) error {
 	return nil
 }
 
-// For a given list of values, it returns only those values
+// For a given list of fields, it returns only those that
 // match the filters. The filter is done by Tag and if
 // available by Sub Field.
-func (filters FieldFilters) Apply(values []Value) []Value {
+func (filters FieldFilters) Apply(fields []Field) []Field {
 	if len(filters.Fields) == 0 {
-		return values
+		return fields
 	}
 
-	var filtered []Value
+	var filtered []Field
 	for _, field := range filters.Fields {
 		// Process all the values that match the tag
 		// (there could be more than one)
-		for _, value := range valuesForTag(values, field.Tag) {
+		for _, value := range valuesForTag(fields, field.Tag) {
 			if len(field.Subfields) == 0 {
 				// add the value as-is, no need to filter by subfield
 				filtered = append(filtered, value)
@@ -82,7 +82,7 @@ func (filters FieldFilters) Apply(values []Value) []Value {
 				//... filter the value by subfield
 				newValue := value
 				newValue.RawValue = ""
-				newValue.SubFieldValues = subFieldValuesFromValue(value, field.Subfields)
+				newValue.SubFields = subFieldValuesFromValue(value, field.Subfields)
 				filtered = append(filtered, newValue)
 			}
 		}
@@ -93,9 +93,9 @@ func (filters FieldFilters) Apply(values []Value) []Value {
 // For a given value, extract the subfield values in the string
 // indicated. "subfields" is a plain string, like "abu", to
 // indicate subfields a, b, and u.
-func subFieldValuesFromValue(value Value, subfields string) []SubFieldValue {
+func subFieldValuesFromValue(value Field, subfields string) []SubFieldValue {
 	var newValues []SubFieldValue
-	for _, sv := range value.SubFieldValues {
+	for _, sv := range value.SubFields {
 		if strings.Contains(subfields, sv.SubField) {
 			yy := SubFieldValue{
 				SubField: sv.SubField,
@@ -107,11 +107,11 @@ func subFieldValuesFromValue(value Value, subfields string) []SubFieldValue {
 	return newValues
 }
 
-func valuesForTag(values []Value, tag string) []Value {
-	var vv []Value
-	for _, value := range values {
-		if value.Tag == tag {
-			vv = append(vv, value)
+func valuesForTag(fields []Field, tag string) []Field {
+	var vv []Field
+	for _, field := range fields {
+		if field.Tag == tag {
+			vv = append(vv, field)
 		}
 	}
 	return vv

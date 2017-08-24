@@ -24,7 +24,7 @@ type BrownItem struct {
 func NewBrownRecord(r Record) BrownRecord {
 	b := BrownRecord{}
 	b.Bib = bib(r)
-	b.Title = pad(r.SubValueFor("245", "a"))
+	b.Title = pad(r.GetValue("245", "a"))
 	b.Items = items(r)
 	return b
 }
@@ -79,8 +79,8 @@ func (p ProcessorBrown) isMatch(r Record) bool {
 	if p.SearchValue == "" {
 		return true
 	}
-	for _, v := range r.Values {
-		if strings.Contains(strings.ToLower(v.RawValue), p.SearchValue) {
+	for _, field := range r.Fields {
+		if strings.Contains(strings.ToLower(field.RawValue), p.SearchValue) {
 			return true
 		}
 	}
@@ -88,43 +88,43 @@ func (p ProcessorBrown) isMatch(r Record) bool {
 }
 
 func bib(r Record) string {
-	bib := r.SubValueFor("907", "a")
+	bib := r.GetValue("907", "a")
 	if bib != "" {
 		bib = bib[1:(len(bib) - 1)]
 	}
 	return bib
 }
 
-func baseCallNumber(r Record) (bool, Value) {
+func baseCallNumber(r Record) (bool, Field) {
 	// 090 ab            LC CALL NO(c)
-	if found, value := r.ValueFor("090"); found {
-		return true, value
+	if found, field := r.GetField("090"); found {
+		return true, field
 	}
 
 	// 091 ab            HARRIS CALL NO(e)
-	if found, value := r.ValueFor("091"); found {
-		return true, value
+	if found, field := r.GetField("091"); found {
+		return true, field
 	}
 
 	// 092 ab            JCB CALL NO(f)
-	if found, value := r.ValueFor("092"); found {
-		return true, value
+	if found, field := r.GetField("092"); found {
+		return true, field
 	}
 
 	// 096 ab           SUDOCS CALL NO(v)
-	if found, value := r.ValueFor("096"); found {
-		return true, value
+	if found, field := r.GetField("096"); found {
+		return true, field
 	}
 
 	// 099 ab            OTHER BROWN CALL (l)
-	if found, value := r.ValueFor("099"); found {
-		return true, value
+	if found, field := r.GetField("099"); found {
+		return true, field
 	}
 
-	return false, Value{}
+	return false, Field{}
 }
 
-func barcode(f Value) string {
+func barcode(f Field) string {
 	barcode := f.SubFieldValue("i")
 	barcode = removeSpaces(barcode)
 	if barcode == "" {
@@ -136,7 +136,7 @@ func barcode(f Value) string {
 func items(r Record) []BrownItem {
 	var items []BrownItem
 
-	marcItems := r.ValuesFor("945")
+	marcItems := r.GetFields("945")
 	if len(marcItems) == 0 {
 		return items
 	}

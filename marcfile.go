@@ -21,7 +21,7 @@ type MarcFile struct {
 type Record struct {
 	Leader    Leader
 	Directory []DirEntry
-	Values    []Value
+	Fields    []Field
 	Pos       int
 }
 
@@ -61,11 +61,11 @@ func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
 	if err != nil {
 		panic(err)
 	}
-	values := file.readValues(directory)
+	fields := file.readValues(directory)
 	record := Record{
 		Leader:    leader,
 		Directory: directory,
-		Values:    values,
+		Fields:    fields,
 		Pos:       file.records,
 	}
 	processor.Process(file, record, file.records)
@@ -117,8 +117,8 @@ func (file *MarcFile) currentOffset() int64 {
 	return offset
 }
 
-func (file *MarcFile) readValues(directory []DirEntry) []Value {
-	values := make([]Value, len(directory))
+func (file *MarcFile) readValues(directory []DirEntry) []Field {
+	fields := make([]Field, len(directory))
 	for i, entry := range directory {
 		buffer := make([]byte, entry.Length)
 		n, err := file.f.Read(buffer)
@@ -126,7 +126,7 @@ func (file *MarcFile) readValues(directory []DirEntry) []Value {
 			panic(err)
 		}
 		value := string(buffer[:n-1]) // -1 to exclude the record separator character (0x1e)
-		values[i] = NewValue(entry.Tag, value)
+		fields[i] = NewField(entry.Tag, value)
 	}
 
 	eor := make([]byte, 1)
@@ -138,38 +138,33 @@ func (file *MarcFile) readValues(directory []DirEntry) []Value {
 	if err != nil {
 		panic(err)
 	}
-	return values
+	return fields
 }
 
-func (r Record) ValuesFor(tag string) []Value {
-	var values []Value
-	for _, value := range r.Values {
-		if value.Tag == tag {
-			values = append(values, value)
+func (r Record) GetFields(tag string) []Field {
+	var fields []Field
+	for _, field := range r.Fields {
+		if field.Tag == tag {
+			fields = append(fields, field)
 		}
 	}
-	return values
+	return fields
 }
 
-func (r Record) ValueFor(tag string) (bool, Value) {
-	for _, value := range r.Values {
-		if value.Tag == tag {
-			return true, value
+func (r Record) GetField(tag string) (bool, Field) {
+	for _, field := range r.Fields {
+		if field.Tag == tag {
+			return true, field
 		}
 	}
-	return false, Value{}
+	return false, Field{}
 }
 
-func (r Record) SubValueFor(tag string, subfield string) string {
-	subValue := ""
-	found, value := r.ValueFor(tag)
+func (r Record) GetValue(tag string, subfield string) string {
+	value := ""
+	found, field := r.GetField(tag)
 	if found {
-		for _, sub := range value.SubFieldValues {
-			if sub.SubField == subfield {
-				subValue = sub.Value
-				break
-			}
-		}
+		value = field.SubFieldValue(subfield)
 	}
-	return subValue
+	return value
 }
