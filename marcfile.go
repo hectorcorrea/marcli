@@ -19,10 +19,10 @@ type MarcFile struct {
 }
 
 type Record struct {
-	Leader Leader
-	Fields []Field
-	Values []Value
-	Pos    int
+	Leader    Leader
+	Directory []DirEntry
+	Values    []Value
+	Pos       int
 }
 
 func NewMarcFile(filename string) (MarcFile, error) {
@@ -63,13 +63,13 @@ func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
 	}
 	values := file.readValues(directory)
 	record := Record{
-		Leader: leader,
-		Fields: directory,
-		Values: values,
-		Pos:    file.records,
+		Leader:    leader,
+		Directory: directory,
+		Values:    values,
+		Pos:       file.records,
 	}
 	processor.Process(file, record, file.records)
-	return Record{Leader: leader, Fields: directory}, nil
+	return Record{Leader: leader, Directory: directory}, nil
 }
 
 func (file *MarcFile) Close() {
@@ -85,7 +85,7 @@ func (file *MarcFile) readLeader() (Leader, error) {
 	return NewLeader(string(bytes))
 }
 
-func (file *MarcFile) readDirectory() ([]Field, error) {
+func (file *MarcFile) readDirectory() ([]DirEntry, error) {
 	const RecordSeparator = 0x1e
 
 	// Source: https://www.socketloop.com/references/golang-bufio-scanrunes-function-example
@@ -96,20 +96,20 @@ func (file *MarcFile) readDirectory() ([]Field, error) {
 		return nil, err
 	}
 	count := (len(ss) - 1) / 12
-	entries := make([]Field, count)
+	directory := make([]DirEntry, count)
 	for i := 0; i < count; i++ {
 		start := i * 12
 		entry := ss[start : start+12]
-		field, err := NewField(entry)
+		field, err := NewDirEntry(entry)
 		if err != nil {
 			return nil, err
 		}
-		entries[i] = field
+		directory[i] = field
 	}
 	// ReadString leaves the file pointer a bit further than we want to.
 	// Force it to be exactly at the end of the directory.
 	file.f.Seek(offset+int64(len(ss)), 0)
-	return entries, nil
+	return directory, nil
 }
 
 func (file *MarcFile) currentOffset() int64 {
@@ -117,7 +117,7 @@ func (file *MarcFile) currentOffset() int64 {
 	return offset
 }
 
-func (file *MarcFile) readValues(entries []Field) []Value {
+func (file *MarcFile) readValues(entries []DirEntry) []Value {
 	values := make([]Value, len(entries))
 	for i, entry := range entries {
 		buffer := make([]byte, entry.Length)
