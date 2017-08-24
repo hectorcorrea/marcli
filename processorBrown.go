@@ -169,6 +169,9 @@ func items(r Record) []BrownItem {
 			copy = "c. " + copy
 		}
 		number := concat3(base, volume, copy)
+		if strings.HasSuffix(number, "\\") {
+			number = number[0 : len(number)-1]
+		}
 		item := BrownItem{Callnumber: number, Barcode: barcode}
 		items = append(items, item)
 	}
