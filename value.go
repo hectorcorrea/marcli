@@ -33,7 +33,7 @@ func (v SubFieldValue) String() string {
 //			RawValue: "$aDiabetes$xComplications$zUnited States."
 //			SubFieldValues (see SubFieldValue definition above)
 //	}
-type Value struct {
+type Field struct {
 	Tag            string
 	Ind1           string
 	Ind2           string
@@ -41,8 +41,8 @@ type Value struct {
 	SubFieldValues []SubFieldValue
 }
 
-func NewValue(tag, valueStr string) Value {
-	value := Value{Tag: tag}
+func NewField(tag, valueStr string) Field {
+	value := Field{Tag: tag}
 
 	if len(valueStr) >= 2 {
 		value.Ind1 = string(valueStr[0])
