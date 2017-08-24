@@ -117,9 +117,9 @@ func (file *MarcFile) currentOffset() int64 {
 	return offset
 }
 
-func (file *MarcFile) readValues(entries []DirEntry) []Value {
-	values := make([]Value, len(entries))
-	for i, entry := range entries {
+func (file *MarcFile) readValues(directory []DirEntry) []Value {
+	values := make([]Value, len(directory))
+	for i, entry := range directory {
 		buffer := make([]byte, entry.Length)
 		n, err := file.f.Read(buffer)
 		if err != nil && err != io.EOF {
