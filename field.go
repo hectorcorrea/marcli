@@ -18,10 +18,6 @@ type SubFieldValue struct {
 	Value    string
 }
 
-func (v SubFieldValue) String() string {
-	return fmt.Sprintf("$%s%s", v.SubField, v.Value)
-}
-
 // Represents the entire value for a field.
 // For example in:
 //		=650  \0$aDiabetes$xComplications$zUnited States.
@@ -39,6 +35,22 @@ type Field struct {
 	Ind2      string
 	RawValue  string // includes indicators and separator character
 	SubFields []SubFieldValue
+}
+
+type Fields struct {
+	fields []Field
+}
+
+func (v SubFieldValue) String() string {
+	return fmt.Sprintf("$%s%s", v.SubField, v.Value)
+}
+
+func (f Fields) All() []Field {
+	return f.fields
+}
+
+func (f *Fields) Add(field Field) {
+	f.fields = append(f.fields, field)
 }
 
 func NewField(tag, valueStr string) Field {
@@ -107,6 +119,33 @@ func (f Field) SubFieldValue(subfield string) string {
 func formatIndicator(value string) string {
 	if value == " " {
 		return "\\"
+	}
+	return value
+}
+
+func (f Fields) Get(tag string) []Field {
+	var fields []Field
+	for _, field := range f.fields {
+		if field.Tag == tag {
+			fields = append(fields, field)
+		}
+	}
+	return fields
+}
+
+func (f Fields) GetOne(tag string) (bool, Field) {
+	fields := f.Get(tag)
+	if len(fields) == 0 {
+		return false, Field{}
+	}
+	return true, fields[0]
+}
+
+func (f Fields) GetValue(tag string, subfield string) string {
+	value := ""
+	found, field := f.GetOne(tag)
+	if found {
+		value = field.SubFieldValue(subfield)
 	}
 	return value
 }

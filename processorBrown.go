@@ -24,7 +24,7 @@ type BrownItem struct {
 func NewBrownRecord(r Record) BrownRecord {
 	b := BrownRecord{}
 	b.Bib = bib(r)
-	b.Title = pad(r.GetValue("245", "a"))
+	b.Title = pad(r.Fields.GetValue("245", "a"))
 	b.Items = items(r)
 	return b
 }
@@ -79,7 +79,7 @@ func (p ProcessorBrown) isMatch(r Record) bool {
 	if p.SearchValue == "" {
 		return true
 	}
-	for _, field := range r.Fields {
+	for _, field := range r.Fields.All() {
 		if strings.Contains(strings.ToLower(field.RawValue), p.SearchValue) {
 			return true
 		}
@@ -88,7 +88,7 @@ func (p ProcessorBrown) isMatch(r Record) bool {
 }
 
 func bib(r Record) string {
-	bib := r.GetValue("907", "a")
+	bib := r.Fields.GetValue("907", "a")
 	if bib != "" {
 		bib = bib[1:(len(bib) - 1)]
 	}
@@ -97,27 +97,27 @@ func bib(r Record) string {
 
 func baseCallNumber(r Record) (bool, Field) {
 	// 090 ab            LC CALL NO(c)
-	if found, field := r.GetField("090"); found {
+	if found, field := r.Fields.GetOne("090"); found {
 		return true, field
 	}
 
 	// 091 ab            HARRIS CALL NO(e)
-	if found, field := r.GetField("091"); found {
+	if found, field := r.Fields.GetOne("091"); found {
 		return true, field
 	}
 
 	// 092 ab            JCB CALL NO(f)
-	if found, field := r.GetField("092"); found {
+	if found, field := r.Fields.GetOne("092"); found {
 		return true, field
 	}
 
 	// 096 ab           SUDOCS CALL NO(v)
-	if found, field := r.GetField("096"); found {
+	if found, field := r.Fields.GetOne("096"); found {
 		return true, field
 	}
 
 	// 099 ab            OTHER BROWN CALL (l)
-	if found, field := r.GetField("099"); found {
+	if found, field := r.Fields.GetOne("099"); found {
 		return true, field
 	}
 
@@ -136,7 +136,7 @@ func barcode(f Field) string {
 func items(r Record) []BrownItem {
 	var items []BrownItem
 
-	marcItems := r.GetFields("945")
+	marcItems := r.Fields.Get("945")
 	if len(marcItems) == 0 {
 		return items
 	}

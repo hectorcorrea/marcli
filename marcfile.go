@@ -21,7 +21,7 @@ type MarcFile struct {
 type Record struct {
 	Leader    Leader
 	Directory []DirEntry
-	Fields    []Field
+	Fields    Fields
 	Pos       int
 }
 
@@ -117,16 +117,17 @@ func (file *MarcFile) currentOffset() int64 {
 	return offset
 }
 
-func (file *MarcFile) readValues(directory []DirEntry) []Field {
-	fields := make([]Field, len(directory))
-	for i, entry := range directory {
+func (file *MarcFile) readValues(directory []DirEntry) Fields {
+	var fields Fields
+	for _, entry := range directory {
 		buffer := make([]byte, entry.Length)
 		n, err := file.f.Read(buffer)
 		if err != nil && err != io.EOF {
 			panic(err)
 		}
 		value := string(buffer[:n-1]) // -1 to exclude the record separator character (0x1e)
-		fields[i] = NewField(entry.Tag, value)
+		field := NewField(entry.Tag, value)
+		fields.Add(field)
 	}
 
 	eor := make([]byte, 1)
@@ -139,32 +140,4 @@ func (file *MarcFile) readValues(directory []DirEntry) []Field {
 		panic(err)
 	}
 	return fields
-}
-
-func (r Record) GetFields(tag string) []Field {
-	var fields []Field
-	for _, field := range r.Fields {
-		if field.Tag == tag {
-			fields = append(fields, field)
-		}
-	}
-	return fields
-}
-
-func (r Record) GetField(tag string) (bool, Field) {
-	for _, field := range r.Fields {
-		if field.Tag == tag {
-			return true, field
-		}
-	}
-	return false, Field{}
-}
-
-func (r Record) GetValue(tag string, subfield string) string {
-	value := ""
-	found, field := r.GetField(tag)
-	if found {
-		value = field.SubFieldValue(subfield)
-	}
-	return value
 }

@@ -41,7 +41,7 @@ func (p ConsoleProcessor) isMatch(r Record) bool {
 	if p.SearchValue == "" {
 		return true
 	}
-	for _, field := range r.Fields {
+	for _, field := range r.Fields.All() {
 		if strings.Contains(strings.ToLower(field.RawValue), p.SearchValue) {
 			return true
 		}
@@ -59,7 +59,7 @@ func (p ConsoleProcessor) outputMrk(r Record, filename string) {
 	if p.Filters.IncludeFileInfo() {
 		fmt.Printf("=FIN  %s\r\n", filename)
 	}
-	for _, field := range p.Filters.Apply(r.Fields) {
+	for _, field := range p.Filters.Apply(r.Fields.All()) {
 		fmt.Printf("%s\r\n", field)
 	}
 	fmt.Printf("\r\n")
@@ -71,7 +71,7 @@ func (p ConsoleProcessor) outputJson(r Record, filename string) {
 	}
 
 	// TODO: Handle Leader, RecordInfo, and FileInfo fields
-	fields := p.Filters.Apply(r.Fields)
+	fields := p.Filters.Apply(r.Fields.All())
 	b, err := json.Marshal(fields)
 	if err != nil {
 		fmt.Printf("%s\r\n", err)
