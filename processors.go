@@ -59,7 +59,8 @@ func (p ConsoleProcessor) outputMrk(r Record, filename string) {
 	if p.Filters.IncludeFileInfo() {
 		fmt.Printf("=FIN  %s\r\n", filename)
 	}
-	for _, field := range p.Filters.Apply(r.Fields.All()) {
+	filteredFields := p.Filters.Apply(r.Fields)
+	for _, field := range filteredFields.All() {
 		fmt.Printf("%s\r\n", field)
 	}
 	fmt.Printf("\r\n")
@@ -71,8 +72,8 @@ func (p ConsoleProcessor) outputJson(r Record, filename string) {
 	}
 
 	// TODO: Handle Leader, RecordInfo, and FileInfo fields
-	fields := p.Filters.Apply(r.Fields.All())
-	b, err := json.Marshal(fields)
+	filteredFields := p.Filters.Apply(r.Fields)
+	b, err := json.Marshal(filteredFields.All())
 	if err != nil {
 		fmt.Printf("%s\r\n", err)
 	}

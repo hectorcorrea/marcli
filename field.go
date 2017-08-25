@@ -116,6 +116,23 @@ func (f Field) SubFieldValue(subfield string) string {
 	return ""
 }
 
+// For a given value, extract the subfield values in the string
+// indicated. "subfields" is a plain string, like "abu", to
+// indicate subfields a, b, and u.
+func (f Field) SubFieldValues(subfields string) []SubFieldValue {
+	var values []SubFieldValue
+	for _, sub := range f.SubFields {
+		if strings.Contains(subfields, sub.SubField) {
+			value := SubFieldValue{
+				SubField: sub.SubField,
+				Value:    sub.Value,
+			}
+			values = append(values, value)
+		}
+	}
+	return values
+}
+
 func formatIndicator(value string) string {
 	if value == " " {
 		return "\\"

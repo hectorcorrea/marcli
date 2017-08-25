@@ -65,56 +65,29 @@ func (filters *FieldFilters) addFilter(fieldStr string) error {
 // For a given list of fields, it returns only those that
 // match the filters. The filter is done by Tag and if
 // available by Sub Field.
-func (filters FieldFilters) Apply(fields []Field) []Field {
+func (filters FieldFilters) Apply(fields Fields) Fields {
 	if len(filters.Fields) == 0 {
 		return fields
 	}
 
-	var filtered []Field
-	for _, field := range filters.Fields {
-		// Process all the values that match the tag
+	filtered := Fields{}
+	for _, filter := range filters.Fields {
+		// Process all the fields that match the tag
 		// (there could be more than one)
-		for _, value := range valuesForTag(fields, field.Tag) {
-			if len(field.Subfields) == 0 {
+		for _, field := range fields.Get(filter.Tag) {
+			if len(filter.Subfields) == 0 {
 				// add the value as-is, no need to filter by subfield
-				filtered = append(filtered, value)
+				filtered.Add(field)
 			} else {
-				//... filter the value by subfield
-				newValue := value
-				newValue.RawValue = ""
-				newValue.SubFields = subFieldValuesFromValue(value, field.Subfields)
-				filtered = append(filtered, newValue)
+				//... filter the field by subfield
+				filteredField := field
+				filteredField.RawValue = ""
+				filteredField.SubFields = field.SubFieldValues(filter.Subfields)
+				filtered.Add(filteredField)
 			}
 		}
 	}
 	return filtered
-}
-
-// For a given value, extract the subfield values in the string
-// indicated. "subfields" is a plain string, like "abu", to
-// indicate subfields a, b, and u.
-func subFieldValuesFromValue(value Field, subfields string) []SubFieldValue {
-	var newValues []SubFieldValue
-	for _, sv := range value.SubFields {
-		if strings.Contains(subfields, sv.SubField) {
-			yy := SubFieldValue{
-				SubField: sv.SubField,
-				Value:    sv.Value,
-			}
-			newValues = append(newValues, yy)
-		}
-	}
-	return newValues
-}
-
-func valuesForTag(fields []Field, tag string) []Field {
-	var vv []Field
-	for _, field := range fields {
-		if field.Tag == tag {
-			vv = append(vv, field)
-		}
-	}
-	return vv
 }
 
 func (filters FieldFilters) IncludeField(name string) bool {
