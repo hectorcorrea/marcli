@@ -57,20 +57,28 @@ func (p ProcessorBrown) Process(f *MarcFile, r Record, count int) {
 	}
 }
 
+func notEmpty(str string) string {
+	if len(str) == 0 {
+		return "-"
+	}
+	return str
+}
+
 func (p ProcessorBrown) outputString(bib, title, callnumber, barcode string) string {
 	output := ""
 	allFields := len(p.Filters.Fields) == 0
+
 	if allFields || p.Filters.IncludeField("bib") {
-		output = bib
+		output = notEmpty(bib)
 	}
 	if allFields || p.Filters.IncludeField("tit") {
-		output = concatTab(output, pad(title))
+		output = concatTab(output, pad(notEmpty(title)))
 	}
 	if allFields || p.Filters.IncludeField("cal") {
-		output = concatTab(output, callnumber)
+		output = concatTab(output, notEmpty(callnumber))
 	}
 	if allFields || p.Filters.IncludeField("bar") {
-		output = concatTab(output, barcode)
+		output = concatTab(output, notEmpty(barcode))
 	}
 	return output
 }
