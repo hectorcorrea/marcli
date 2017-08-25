@@ -150,7 +150,6 @@ func items(r Record) []BrownItem {
 	f_090a := f_090.SubFieldValue("a")
 	f_090b := f_090.SubFieldValue("b")
 	f_090f := f_090.SubFieldValue("f") // 1-SIZE
-
 	// get the call numbers from the items
 	for _, f_945 := range marcItems {
 		barcode := barcode(f_945)
@@ -197,11 +196,11 @@ func _concat(a, b, sep string) string {
 	if a == "" && b == "" {
 		return ""
 	} else if a == "" && b != "" {
-		return b
+		return strings.TrimSpace(b)
 	} else if a != "" && b == "" {
-		return a
+		return strings.TrimSpace(a)
 	}
-	return a + sep + b
+	return strings.TrimSpace(a) + sep + strings.TrimSpace(b)
 }
 
 func concat3(a, b, c string) string {
