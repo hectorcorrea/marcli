@@ -50,20 +50,23 @@ func (p ConsoleProcessor) isMatch(r Record) bool {
 }
 
 func (p ConsoleProcessor) outputMrk(r Record, filename string) {
+	str := ""
 	if p.Filters.IncludeLeader() {
-		fmt.Printf("%s\r\n", r.Leader)
+		str += fmt.Sprintf("%s\r\n", r.Leader)
 	}
 	if p.Filters.IncludeRecordInfo() {
-		fmt.Printf("=RIN  pos=%d, length=%d, data offset=%d\r\n", r.Pos, r.Leader.Length, r.Leader.DataOffset)
+		str += fmt.Sprintf("=RIN  pos=%d, length=%d, data offset=%d\r\n", r.Pos, r.Leader.Length, r.Leader.DataOffset)
 	}
 	if p.Filters.IncludeFileInfo() {
-		fmt.Printf("=FIN  %s\r\n", filename)
+		str += fmt.Sprintf("=FIN  %s\r\n", filename)
 	}
 	filteredFields := p.Filters.Apply(r.Fields)
 	for _, field := range filteredFields.All() {
-		fmt.Printf("%s\r\n", field)
+		str += fmt.Sprintf("%s\r\n", field)
 	}
-	fmt.Printf("\r\n")
+	if str != "" {
+		fmt.Printf("%s\r\n", str)
+	}
 }
 
 func (p ConsoleProcessor) outputJson(r Record, filename string) {
