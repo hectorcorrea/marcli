@@ -37,7 +37,7 @@ func NewSolrDocument(r Record) SolrDocument {
 	if author != "" {
 		doc.Author = author
 		doc.AuthorDate = r.Fields.GetValue("100", "d")
-		doc.AuthorFuller = r.Fields.GetValue("100", "a")
+		doc.AuthorFuller = r.Fields.GetValue("100", "q")
 	} else {
 		doc.Author = r.Fields.GetValue("110", "a")
 		doc.AuthorDate = ""
