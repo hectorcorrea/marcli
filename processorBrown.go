@@ -42,10 +42,7 @@ func (p ProcessorBrown) Header() {
 func (p ProcessorBrown) Footer() {
 }
 
-func (p ProcessorBrown) Process(f *MarcFile, r Record, count int) {
-	if !p.isMatch(r) {
-		return
-	}
+func (p ProcessorBrown) ProcessRecord(f *MarcFile, r Record) {
 	b := NewBrownRecord(r)
 	if len(b.Items) == 0 {
 		// fmt.Printf("%s\t%s\t%s\r\n", b.Bib, b.Title, "--")
@@ -55,6 +52,9 @@ func (p ProcessorBrown) Process(f *MarcFile, r Record, count int) {
 			fmt.Printf("%s\r\n", output)
 		}
 	}
+}
+
+func (p ProcessorBrown) Separator() {
 }
 
 func notEmpty(str string) string {

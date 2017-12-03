@@ -8,7 +8,6 @@ import (
 type ProcessorSolr struct {
 	Filters     FieldFilters
 	SearchValue string
-	outputCount int
 }
 
 type SolrDocument struct {
@@ -21,7 +20,7 @@ type SolrDocument struct {
 	Subjects     []string // MARC 650
 }
 
-func NewSolrDocument(r Record) (SolrDocument, bool) {
+func NewSolrDocument(r Record) SolrDocument {
 	doc := SolrDocument{}
 	doc.Id = r.Fields.GetValue("001", "")
 	doc.Author = r.Fields.GetValue("100", "a")
@@ -30,8 +29,7 @@ func NewSolrDocument(r Record) (SolrDocument, bool) {
 	doc.Title = r.Fields.GetValue("245", "a")
 	doc.Publisher = r.Fields.GetValue("260", "a")
 	doc.Subjects = subjects(r)
-	empty := (doc.Id == "" || doc.Author == "" || doc.Title == "")
-	return doc, empty
+	return doc
 }
 
 func (p ProcessorSolr) Header() {
@@ -42,19 +40,17 @@ func (p ProcessorSolr) Footer() {
 	fmt.Printf("]\r\n")
 }
 
-func (p ProcessorSolr) Process(f *MarcFile, r Record, count int) {
-	doc, empty := NewSolrDocument(r)
-	if empty {
-		return
-	}
-	if count > 1 {
-		fmt.Printf(", \r\n")
-	}
+func (p ProcessorSolr) ProcessRecord(f *MarcFile, r Record) {
+	doc := NewSolrDocument(r)
 	str, err := json.Marshal(doc)
 	if err != nil {
 		fmt.Printf("%s\r\n", err)
 	}
 	fmt.Printf("%s\r\n", str)
+}
+
+func (p ProcessorSolr) Separator() {
+	fmt.Printf(", \r\n")
 }
 
 func subjects(r Record) []string {

@@ -6,23 +6,18 @@ import (
 	"os"
 )
 
-type RecordProcessor interface {
-	Process(*MarcFile, Record, int)
-	Header() // these shouldn't be a the record level or we could
-	Footer() // rename RecordProcessor to something else?
+type Processor interface {
+	ProcessRecord(*MarcFile, Record)
+	Header()
+	Footer()
+	Separator()
 }
 
 type MarcFile struct {
-	Name    string
-	f       *os.File
-	records int
-}
-
-type Record struct {
-	Leader    Leader
-	Directory []DirEntry
-	Fields    Fields
-	Pos       int
+	Name        string
+	f           *os.File
+	records     int
+	outputCount int
 }
 
 func NewMarcFile(filename string) (MarcFile, error) {
@@ -33,15 +28,25 @@ func NewMarcFile(filename string) (MarcFile, error) {
 	return MarcFile{Name: filename, f: f, records: 0}, nil
 }
 
-func (file *MarcFile) ReadAll(processor RecordProcessor) error {
+func (file *MarcFile) ReadAll(processor Processor, searchValue string) error {
 	processor.Header()
 	for {
-		_, err := file.readRecord(processor)
+		record, err := file.readRecord(processor)
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
+		}
+
+		file.records += 1
+
+		if record.IsMatch(searchValue) {
+			if file.outputCount > 0 {
+				processor.Separator()
+			}
+			processor.ProcessRecord(file, record)
+			file.outputCount += 1
 		}
 	}
 	file.f.Close()
@@ -49,13 +54,11 @@ func (file *MarcFile) ReadAll(processor RecordProcessor) error {
 	return nil
 }
 
-func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
+func (file *MarcFile) readRecord(processor Processor) (Record, error) {
 	leader, err := file.readLeader()
 	if err != nil {
 		return Record{}, err
 	}
-
-	file.records += 1
 
 	directory, err := file.readDirectory()
 	if err != nil {
@@ -68,8 +71,7 @@ func (file *MarcFile) readRecord(processor RecordProcessor) (Record, error) {
 		Fields:    fields,
 		Pos:       file.records,
 	}
-	processor.Process(file, record, file.records)
-	return Record{Leader: leader, Directory: directory}, nil
+	return record, nil
 }
 
 func (file *MarcFile) Close() {
