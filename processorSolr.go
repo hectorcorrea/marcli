@@ -64,7 +64,7 @@ func (p ProcessorSolr) Header() {
 }
 
 func (p ProcessorSolr) Footer() {
-	fmt.Printf("]\r\n")
+	fmt.Printf("\r\n]\r\n")
 }
 
 func (p ProcessorSolr) ProcessRecord(f *MarcFile, r Record) {
@@ -73,7 +73,7 @@ func (p ProcessorSolr) ProcessRecord(f *MarcFile, r Record) {
 	if err != nil {
 		fmt.Printf("%s\r\n", err)
 	}
-	fmt.Printf("%s\r\n", str)
+	fmt.Printf("%s", str)
 }
 
 func (p ProcessorSolr) Separator() {
