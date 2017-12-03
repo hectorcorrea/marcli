@@ -38,3 +38,13 @@ func concat3(a, b, c string) string {
 func removeSpaces(s string) string {
 	return strings.Replace(s, " ", "", -1)
 }
+
+func trimPeriod(s string) string {
+	if s == "" || s == "." {
+		return ""
+	}
+	if strings.HasSuffix(s, ".") {
+		return strings.TrimSpace(s[:len(s)-1])
+	}
+	return s
+}

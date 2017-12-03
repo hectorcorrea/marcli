@@ -85,7 +85,7 @@ func subjects(r Record, subfield string) []string {
 	for _, f_650 := range r.Fields.Get("650") {
 		value := f_650.SubFieldValue(subfield)
 		if value != "" {
-			values = append(values, value)
+			values = append(values, trimPeriod(value))
 		}
 	}
 	return values
