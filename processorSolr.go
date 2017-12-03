@@ -22,7 +22,11 @@ type SolrDocument struct {
 
 func NewSolrDocument(r Record) SolrDocument {
 	doc := SolrDocument{}
-	doc.Id = r.Fields.GetValue("001", "")
+	id = r.Fields.GetValue("001", "")
+	if id == "" {
+		id = "INVALID"
+	}
+	doc.Id = id
 	author := r.Fields.GetValue("100", "a")
 	if author != "" {
 		doc.Author = author
