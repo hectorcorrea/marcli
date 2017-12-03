@@ -11,13 +11,13 @@ type ProcessorSolr struct {
 }
 
 type SolrDocument struct {
-	Id           string   // MARC 001
-	Author       string   // MARC 100a
-	AuthorDate   string   // MARC 100d
-	AuthorFuller string   // MARC 100q
-	Title        string   // MARC 245
-	Publisher    string   // MARC 260
-	Subjects     []string // MARC 650
+	Id           string   `json:"id"`
+	Author       string   `json:"author,omitempty"`
+	AuthorDate   string   `json:"authorDate,omitempty"`
+	AuthorFuller string   `json:"authorFuller,omitempty"`
+	Title        string   `json:"title,omitempty"`
+	Publisher    string   `json:"publisher,omitempty"`
+	Subjects     []string `json:"subjects,omitempty"`
 }
 
 func NewSolrDocument(r Record) SolrDocument {
