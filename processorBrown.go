@@ -83,18 +83,6 @@ func (p ProcessorBrown) outputString(bib, title, callnumber, barcode string) str
 	return output
 }
 
-func (p ProcessorBrown) isMatch(r Record) bool {
-	if p.SearchValue == "" {
-		return true
-	}
-	for _, field := range r.Fields.All() {
-		if strings.Contains(strings.ToLower(field.RawValue), p.SearchValue) {
-			return true
-		}
-	}
-	return false
-}
-
 func bib(r Record) string {
 	bib := r.Fields.GetValue("907", "a")
 	if bib != "" {
@@ -183,38 +171,4 @@ func items(r Record) []BrownItem {
 		items = append(items, item)
 	}
 	return items
-}
-
-func pad(str string) string {
-	if len(str) > 40 {
-		return str[0:40]
-	}
-	return fmt.Sprintf("%-40s", str)
-}
-
-func concat(a, b string) string {
-	return _concat(a, b, " ")
-}
-
-func concatTab(a, b string) string {
-	return _concat(a, b, "\t")
-}
-
-func _concat(a, b, sep string) string {
-	if a == "" && b == "" {
-		return ""
-	} else if a == "" && b != "" {
-		return strings.TrimSpace(b)
-	} else if a != "" && b == "" {
-		return strings.TrimSpace(a)
-	}
-	return strings.TrimSpace(a) + sep + strings.TrimSpace(b)
-}
-
-func concat3(a, b, c string) string {
-	return concat(concat(a, b), c)
-}
-
-func removeSpaces(s string) string {
-	return strings.Replace(s, " ", "", -1)
 }
