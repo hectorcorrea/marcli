@@ -23,9 +23,17 @@ type SolrDocument struct {
 func NewSolrDocument(r Record) SolrDocument {
 	doc := SolrDocument{}
 	doc.Id = r.Fields.GetValue("001", "")
-	doc.Author = r.Fields.GetValue("100", "a")
-	doc.AuthorDate = r.Fields.GetValue("100", "d")
-	doc.AuthorFuller = r.Fields.GetValue("100", "a")
+	author := r.Fields.GetValue("100", "a")
+	if author != "" {
+		doc.Author = author
+		doc.AuthorDate = r.Fields.GetValue("100", "d")
+		doc.AuthorFuller = r.Fields.GetValue("100", "a")
+	} else {
+		doc.Author = r.Fields.GetValue("110", "a")
+		doc.AuthorDate = ""
+		doc.AuthorFuller = ""
+	}
+
 	doc.Title = r.Fields.GetValue("245", "a")
 	doc.Publisher = r.Fields.GetValue("260", "a")
 	doc.Subjects = subjects(r)
