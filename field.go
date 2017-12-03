@@ -162,7 +162,11 @@ func (f Fields) GetValue(tag string, subfield string) string {
 	value := ""
 	found, field := f.GetOne(tag)
 	if found {
-		value = field.SubFieldValue(subfield)
+		if subfield == "" {
+			value = field.RawValue
+		} else {
+			value = field.SubFieldValue(subfield)
+		}
 	}
 	return value
 }
