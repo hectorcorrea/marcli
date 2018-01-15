@@ -48,6 +48,10 @@ func (file *MarcFile) ReadAll(processor Processor, searchValue string) error {
 			processor.ProcessRecord(file, record)
 			file.outputCount += 1
 		}
+
+		if file.outputCount == 10000 {
+			break
+		}
 	}
 	file.f.Close()
 	processor.Footer()
