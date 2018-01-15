@@ -170,3 +170,19 @@ func (f Fields) GetValue(tag string, subfield string) string {
 	}
 	return value
 }
+
+func (f Fields) GetValues(tag string, subfield string) []string {
+	var values []string
+	for _, field := range f.Get(tag) {
+		var value string
+		if subfield == "" {
+			value = field.RawValue
+		} else {
+			value = field.SubFieldValue(subfield)
+		}
+		if value != "" {
+			values = append(values, value)
+		}
+	}
+	return values
+}
