@@ -16,9 +16,11 @@ type SolrDocument struct {
 	Author          string   `json:"author,omitempty"`
 	AuthorDate      string   `json:"authorDate,omitempty"`
 	AuthorFuller    string   `json:"authorFuller,omitempty"`
+	AuthorsOther    []string `json:"authorsOther,omitempty"`
 	Title           string   `json:"title,omitempty"`
 	Responsibility  string   `json:"responsibility,omitempty"`
 	Publisher       string   `json:"publisher,omitempty"`
+	Urls            []string `json:"urls_ss,omitempty"`
 	Subjects        []string `json:"subjects,omitempty"`
 	SubjectsForm    []string `json:"subjectsForm,omitempty"`
 	SubjectsGeneral []string `json:"subjectsGeneral,omitempty"`
@@ -43,6 +45,7 @@ func NewSolrDocument(r Record) SolrDocument {
 		doc.AuthorDate = ""
 		doc.AuthorFuller = ""
 	}
+	doc.AuthorsOther = r.Fields.GetValues("700", "a")
 
 	titleA := r.Fields.GetValue("245", "a")
 	titleB := r.Fields.GetValue("245", "b")
@@ -51,6 +54,7 @@ func NewSolrDocument(r Record) SolrDocument {
 	doc.Responsibility = titleC
 
 	doc.Publisher = r.Fields.GetValue("260", "a")
+	doc.Urls = r.Fields.GetValues("856", "u")
 	doc.Subjects = subjects(r, "a")
 	doc.SubjectsForm = subjects(r, "v")
 	doc.SubjectsGeneral = subjects(r, "x")
