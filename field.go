@@ -55,21 +55,24 @@ func (f *Fields) Add(field Field) {
 
 func NewField(tag, valueStr string) Field {
 	value := Field{Tag: tag}
+	if tag <= "008" {
+		// Control fields (001-008) don't have indicators or subfields
+		// so we just get the value as-is.
+		value.RawValue = valueStr
+		return value
+	}
 
+	// Process the indicators and subfields
 	if len(valueStr) >= 2 {
 		value.Ind1 = string(valueStr[0])
 		value.Ind2 = string(valueStr[1])
 	}
-
 	if len(valueStr) > 2 {
-		// notice that we skip the indicators because they are handled above
-		// and valueStr[2] because that's a separator character
+		// notice that we skip the indicators [0] and [1] because they are handled
+		// above and valueStr[2] because that's a separator character
 		value.RawValue = valueStr[3:]
 	}
-
-	if tag > "009" {
-		value.SubFields = NewSubFieldValues(valueStr)
-	}
+	value.SubFields = NewSubFieldValues(valueStr)
 	return value
 }
 
