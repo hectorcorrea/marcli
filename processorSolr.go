@@ -13,19 +13,19 @@ type ProcessorSolr struct {
 
 type SolrDocument struct {
 	Id              string   `json:"id"`
-	Author          string   `json:"author,omitempty"`
-	AuthorDate      string   `json:"authorDate,omitempty"`
-	AuthorFuller    string   `json:"authorFuller,omitempty"`
-	AuthorsOther    []string `json:"authorsOther,omitempty"`
-	Title           string   `json:"title,omitempty"`
-	Responsibility  string   `json:"responsibility,omitempty"`
-	Publisher       string   `json:"publisher,omitempty"`
+	Author          string   `json:"author_txt_en,omitempty"`
+	AuthorDate      string   `json:"authorDate_s,omitempty"`
+	AuthorFuller    string   `json:"authorFuller_txt_en,omitempty"`
+	AuthorsOther    []string `json:"authorsOther_txts_en,omitempty"`
+	Title           string   `json:"title_txt_en,omitempty"`
+	Responsibility  string   `json:"responsibility_txt_en,omitempty"`
+	Publisher       string   `json:"publisher_txt_en,omitempty"`
 	Urls            []string `json:"urls_ss,omitempty"`
-	Subjects        []string `json:"subjects,omitempty"`
-	SubjectsForm    []string `json:"subjectsForm,omitempty"`
-	SubjectsGeneral []string `json:"subjectsGeneral,omitempty"`
-	SubjectsChrono  []string `json:"subjectsChrono,omitempty"`
-	SubjectsGeo     []string `json:"subjectsGeo,omitempty"`
+	Subjects        []string `json:"subjects_txts_en,omitempty"`
+	SubjectsForm    []string `json:"subjectsForm_txts_en,omitempty"`
+	SubjectsGeneral []string `json:"subjectsGeneral_txts_en,omitempty"`
+	SubjectsChrono  []string `json:"subjectsChrono_txts_en,omitempty"`
+	SubjectsGeo     []string `json:"subjectsGeo_txts_en,omitempty"`
 }
 
 func NewSolrDocument(r Record) SolrDocument {
