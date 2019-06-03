@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 )
@@ -14,10 +16,11 @@ type Processor interface {
 }
 
 type MarcFile struct {
-	Name        string
-	f           *os.File
-	records     int
-	outputCount int
+	Name           string
+	f              *os.File
+	records        int
+	outputCount    int
+	lastGoodRecord Record
 }
 
 func NewMarcFile(filename string) (MarcFile, error) {
@@ -26,6 +29,10 @@ func NewMarcFile(filename string) (MarcFile, error) {
 		return MarcFile{}, err
 	}
 	return MarcFile{Name: filename, f: f, records: 0}, nil
+}
+
+func (file *MarcFile) Close() {
+	file.f.Close()
 }
 
 func (file *MarcFile) ReadAll(processor Processor, searchValue string) error {
@@ -39,19 +46,15 @@ func (file *MarcFile) ReadAll(processor Processor, searchValue string) error {
 			return err
 		}
 
-		file.records += 1
+		file.records++
 
 		if record.IsMatch(searchValue) {
 			if file.outputCount > 0 {
 				processor.Separator()
 			}
 			processor.ProcessRecord(file, record)
-			file.outputCount += 1
+			file.outputCount++
 		}
-
-		// if file.outputCount == 10000 {
-		// 	break
-		// }
 	}
 	file.f.Close()
 	processor.Footer()
@@ -66,8 +69,9 @@ func (file *MarcFile) readRecord(processor Processor) (Record, error) {
 
 	directory, err := file.readDirectory()
 	if err != nil {
-		panic(err)
+		file.stopProcessing(err)
 	}
+
 	fields := file.readValues(directory)
 	record := Record{
 		Leader:    leader,
@@ -75,11 +79,8 @@ func (file *MarcFile) readRecord(processor Processor) (Record, error) {
 		Fields:    fields,
 		Pos:       file.records,
 	}
+	file.lastGoodRecord = record
 	return record, nil
-}
-
-func (file *MarcFile) Close() {
-	file.f.Close()
 }
 
 func (file *MarcFile) readLeader() (Leader, error) {
@@ -108,7 +109,8 @@ func (file *MarcFile) readDirectory() ([]DirEntry, error) {
 		entry := ss[start : start+12]
 		field, err := NewDirEntry(entry)
 		if err != nil {
-			return nil, err
+			errMsg := fmt.Sprintf("%s (raw directory: %s)", err, ss)
+			return nil, errors.New(errMsg)
 		}
 		directory[i] = field
 	}
@@ -129,7 +131,10 @@ func (file *MarcFile) readValues(directory []DirEntry) Fields {
 		buffer := make([]byte, entry.Length)
 		n, err := file.f.Read(buffer)
 		if err != nil && err != io.EOF {
-			panic(err)
+			file.stopProcessing(err)
+		}
+		if n <= 0 {
+			file.stopProcessing(errors.New("Value of length zero detected"))
 		}
 		value := string(buffer[:n-1]) // -1 to exclude the record separator character (0x1e)
 		field := NewField(entry.Tag, value)
@@ -139,11 +144,20 @@ func (file *MarcFile) readValues(directory []DirEntry) Fields {
 	eor := make([]byte, 1)
 	n, err := file.f.Read(eor)
 	if n != 1 {
-		panic("End of record byte not found")
+		file.stopProcessing(errors.New("End of record byte not found"))
 	}
 
 	if err != nil {
-		panic(err)
+		file.stopProcessing(err)
 	}
 	return fields
+}
+
+func (file *MarcFile) stopProcessing(err error) {
+	msg := fmt.Sprintf("Records processed: %d\r\n", file.records)
+	if file.records > 0 {
+		msg += fmt.Sprintf("Last record processed: %s\r\n", file.lastGoodRecord)
+	}
+	msg += fmt.Sprintf("Error: %s", err)
+	panic(msg)
 }

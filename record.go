@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -21,4 +22,8 @@ func (r Record) IsMatch(searchValue string) bool {
 		}
 	}
 	return false
+}
+
+func (r Record) String() string {
+	return fmt.Sprintf("Leader: %s", r.Leader)
 }
