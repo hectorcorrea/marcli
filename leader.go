@@ -1,13 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 )
 
-// Leader contains a subset of the bytes in the record leader. Omitted are
-// bytes specifying the length of parts of the record and bytes which do
-// not vary from record to record.
+// Leader represents the leader of the MARC record.
 type Leader struct {
+	raw           []byte
+	dataOffset    int
 	Status        byte // 05 byte position
 	Type          byte // 06
 	BibLevel      byte // 07
@@ -17,21 +19,33 @@ type Leader struct {
 	Multipart     byte // 19
 }
 
-// type Leader struct {
-// 	raw        string
-// 	Length     int
-// 	DataOffset int
-// }
+// NewLeader creates a Leader from the data in the MARC record.
+func NewLeader(bytes []byte) (Leader, error) {
+	if len(bytes) != 24 {
+		return Leader{}, errors.New("Incomplete leader")
+	}
 
-// func NewLeader(value string) (Leader, error) {
-// 	if len(value) != 24 {
-// 		return Leader{}, errors.New("Incomplete leader")
-// 	}
-// 	l, _ := strconv.Atoi(value[0:5])
-// 	o, _ := strconv.Atoi(value[12:17])
-// 	return Leader{raw: value, Length: l, DataOffset: o}, nil
-// }
+	// length, _ := strconv.Atoi(string(bytes[0:5]))
+	offset, err := strconv.Atoi(string(bytes[12:17]))
+	if err != nil {
+		msg := fmt.Sprintf("Could not determine data offset from leader (%s)", string(bytes))
+		return Leader{}, errors.New(msg)
+	}
+
+	leader := Leader{
+		raw:           bytes,
+		dataOffset:    offset,
+		Status:        bytes[5],
+		Type:          bytes[6],
+		BibLevel:      bytes[7],
+		Control:       bytes[8],
+		EncodingLevel: bytes[17],
+		Form:          bytes[18],
+		Multipart:     bytes[19],
+	}
+	return leader, nil
+}
 
 func (l Leader) String() string {
-	return fmt.Sprintf("=LDR  %s", "TODO")
+	return fmt.Sprintf("=LDR  %s", string(l.raw))
 }

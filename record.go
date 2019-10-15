@@ -8,24 +8,24 @@ import (
 // which contains both ControlFields and DataFields.
 type Record struct {
 	Data   []byte
-	Fields []DataField
+	Fields []Field
 	Leader Leader
 }
 
-func (r Record) IsMatch(searchValue string) bool {
-	return true
-	// TODO
-	// if searchValue == "" {
-	// 	return true
-	// }
-	// for _, field := range r.Fields.All() {
-	// 	if strings.Contains(strings.ToLower(field.RawValue), searchValue) {
-	// 		return true
-	// 	}
-	// }
-	// return false
+// Contains returns true if Record contains the value passed.
+func (r Record) Contains(searchValue string) bool {
+	if searchValue == "" {
+		return true
+	}
+	for _, field := range r.Fields {
+		if field.Contains(searchValue) {
+			return true
+		}
+	}
+	return false
 }
 
+// ControlNum returns the control number (tag 001) for the record.
 func (r Record) ControlNum() string {
 	for _, f := range r.Fields {
 		if f.Tag == "001" {

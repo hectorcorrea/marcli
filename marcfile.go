@@ -13,16 +13,21 @@ const (
 	st = 0x1f // End of subfield
 )
 
+// MarcFile represents a MARC file and mimic Go's native Scanner
+// interface (Scan, Err, Text)
 type MarcFile struct {
 	scanner *bufio.Scanner
 }
 
-func NewMarcFile(f *os.File) MarcFile {
-	scanner := bufio.NewScanner(f)
+// NewMarcFile creates a scanner to manage reading the contents
+// of the MARC file using Go's native Scanner interface.
+// (stolen from https://github.com/MITLibraries/fml)
+func NewMarcFile(file *os.File) MarcFile {
+	scanner := bufio.NewScanner(file)
 
 	// By default Scanner.Scan() returns "bufio.Scanner: token too long" if
-	// block to read is longer than64K. Since MARC records can be up to 100K
-	// we use a custom value. See https://stackoverflow.com/a/37455465/446681
+	// the block to read is longer than 64K. Since MARC records can be up to
+	// 100K we use a custom value. See https://stackoverflow.com/a/37455465/446681
 	initialBuffer := make([]byte, 0, 64*1024)
 	customMaxSize := 105 * 1024
 	scanner.Buffer(initialBuffer, customMaxSize)
@@ -47,36 +52,30 @@ func splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return
 }
 
+// Err returns the error in the scanner (if any)
 func (file *MarcFile) Err() error {
 	return file.scanner.Err()
 }
 
-func (file *MarcFile) Next() bool {
+// Scan moves the scanner to the next record.
+// Returns false when no more records can be read.
+func (file *MarcFile) Scan() bool {
 	return file.scanner.Scan()
 }
 
-// Value returns the current Record on the MarcIterator.
-func (file *MarcFile) Value() (Record, error) {
-	return file.scanIntoRecord(file.scanner.Bytes())
-}
-
-func (file *MarcFile) scanIntoRecord(bytes []byte) (Record, error) {
+// Record returns the current Record in the MarcFile.
+func (file *MarcFile) Record() (Record, error) {
+	bytes := file.scanner.Bytes()
 	rec := Record{}
 	rec.Data = append([]byte(nil), bytes...)
-	rec.Leader = Leader{
-		Status:        bytes[5],
-		Type:          bytes[6],
-		BibLevel:      bytes[7],
-		Control:       bytes[8],
-		EncodingLevel: bytes[17],
-		Form:          bytes[18],
-		Multipart:     bytes[19],
-	}
 
-	start, err := strconv.Atoi(string(bytes[12:17]))
+	leader, err := NewLeader(bytes[0:24])
 	if err != nil {
-		return rec, errors.New("Could not determine record start")
+		return rec, err
 	}
+	rec.Leader = leader
+
+	start := leader.dataOffset
 	data := bytes[start:]
 	dirs := bytes[24 : start-1]
 
