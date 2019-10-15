@@ -54,5 +54,5 @@ func mrkProcessor(filename string, searchValue string, filters FieldFilters) err
 		}
 	}
 
-	return nil
+	return marc.Err()
 }

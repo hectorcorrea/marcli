@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -20,6 +19,14 @@ type MarcFile struct {
 
 func NewMarcFile(f *os.File) MarcFile {
 	scanner := bufio.NewScanner(f)
+
+	// By default Scanner.Scan() returns "bufio.Scanner: token too long" if
+	// block to read is longer than64K. Since MARC records can be up to 100K
+	// we use a custom value. See https://stackoverflow.com/a/37455465/446681
+	initialBuffer := make([]byte, 0, 64*1024)
+	customMaxSize := 105 * 1024
+	scanner.Buffer(initialBuffer, customMaxSize)
+
 	scanner.Split(splitFunc)
 	return MarcFile{scanner: scanner}
 }
@@ -40,12 +47,12 @@ func splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return
 }
 
+func (file *MarcFile) Err() error {
+	return file.scanner.Err()
+}
+
 func (file *MarcFile) Next() bool {
-	x := file.scanner.Scan()
-	if x == false {
-		fmt.Printf("scanner returned false")
-	}
-	return x
+	return file.scanner.Scan()
 }
 
 // Value returns the current Record on the MarcIterator.

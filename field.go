@@ -50,9 +50,9 @@ func MakeField(tag string, data []byte) (DataField, error) {
 
 func (f DataField) String() string {
 	if f.IsControlField() {
-		return fmt.Sprintf("%s %s", f.Tag, f.Value)
+		return fmt.Sprintf("=%s %s", f.Tag, f.Value)
 	}
-	str := fmt.Sprintf("%s %s%s", f.Tag, f.Indicator1, f.Indicator2)
+	str := fmt.Sprintf("=%s %s%s", f.Tag, f.Indicator1, f.Indicator2)
 	for _, sub := range f.SubFields {
 		str += fmt.Sprintf(" %s|%s", sub.Code, sub.Value)
 	}
