@@ -63,6 +63,10 @@ func NewSolrDocument(r Record) SolrDocument {
 	return doc
 }
 
+func (p ProcessorSolr) Process(filename string, searchValue string, field string) error {
+	return nil
+}
+
 func (p ProcessorSolr) Header() {
 	fmt.Printf("[\r\n")
 }

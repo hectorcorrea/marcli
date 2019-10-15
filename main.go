@@ -17,36 +17,15 @@ func init() {
 }
 
 func main() {
-
 	if fileName == "" {
 		fmt.Printf("marcli parameters:\r\n")
 		flag.PrintDefaults()
 		return
 	}
-
-	file, err := NewMarcFile(fileName)
-	if err != nil {
-		panic(err)
-	}
-
 	searchValue := strings.ToLower(search)
-	var processor Processor
-	if format == "brown" {
-		processor = ProcessorBrown{
-			Filters: NewFieldFilters(fields),
-		}
-	} else if format == "solr" {
-		processor = ProcessorSolr{
-			Filters: NewFieldFilters(fields),
-		}
-	} else {
-		processor = ConsoleProcessor{
-			Filters: NewFieldFilters(fields),
-			Format:  format,
-		}
-	}
-	err = file.ReadAll(processor, searchValue)
-
+	filters := NewFieldFilters(fields)
+	// TODO: handle multiple formats (brown, solr, json)
+	err := mrkProcessor(fileName, searchValue, filters)
 	if err != nil {
 		panic(err)
 	}

@@ -29,6 +29,10 @@ func NewBrownRecord(r Record) BrownRecord {
 	return b
 }
 
+func (p ProcessorBrown) Process(filename string, searchValue string, field string) error {
+	return nil
+}
+
 func (p ProcessorBrown) Header() {
 	header := ""
 	if len(p.Filters.Fields) == 0 {

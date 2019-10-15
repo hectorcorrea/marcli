@@ -1,0 +1,39 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type JsonProcessor struct {
+	Filters     FieldFilters
+	SearchValue string
+	Format      string
+}
+
+func (p JsonProcessor) Process(filename string, searchValue string, field string) error {
+	return nil
+}
+
+func (p JsonProcessor) Header() {
+	fmt.Printf("[\r\n")
+}
+
+func (p JsonProcessor) Footer() {
+	fmt.Printf("]\r\n")
+}
+
+func (p JsonProcessor) ProcessRecord(f *MarcFile, r Record) {
+	// TODO: Handle Leader, RecordInfo, and FileInfo fields
+	filteredFields := p.Filters.Apply(r.Fields)
+	b, err := json.Marshal(filteredFields.All())
+	if err != nil {
+		fmt.Printf("%s\r\n", err)
+	}
+	// fmt.Printf("{ \"record\": %s}\r\n", b)
+	fmt.Printf("%s\r\n", b)
+}
+
+func (p JsonProcessor) Separator() {
+	fmt.Printf(", \r\n")
+}
