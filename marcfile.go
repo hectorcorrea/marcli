@@ -13,8 +13,8 @@ const (
 	st = 0x1f // End of subfield
 )
 
-// MarcFile represents a MARC file and mimic Go's native Scanner
-// interface (Scan, Err, Text)
+// MarcFile represents a MARC file.
+// The public interface more or less mimic Go's native Scanner (Scan, Err, Text)
 type MarcFile struct {
 	scanner *bufio.Scanner
 }
@@ -49,7 +49,7 @@ func splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return i + 1, data[0:i], nil
 	}
 
-	return
+	return 0, nil, nil
 }
 
 // Err returns the error in the scanner (if any)
