@@ -29,9 +29,28 @@ func NewFieldFilters(fieldsStr string) FieldFilters {
 	}
 	filters := FieldFilters{}
 	for _, value := range strings.Split(fieldsStr, ",") {
-		filters.addFilter(value)
+		filter, err := NewFieldFilter(value)
+		if err != nil {
+			// TODO: handle error
+			return FieldFilters{}
+		}
+		filters.Fields = append(filters.Fields, filter)
 	}
 	return filters
+}
+
+// fieldStr is a string in the format NNNabc
+func NewFieldFilter(fieldStr string) (FieldFilter, error) {
+	if len(fieldStr) < 3 {
+		return FieldFilter{}, errors.New("Invalid field string (too short)")
+	}
+	tag := fieldStr[0:3]
+	subfields := ""
+	if len(fieldStr) > 3 {
+		subfields = fieldStr[3:]
+	}
+	filter := FieldFilter{Tag: tag, Subfields: subfields}
+	return filter, nil
 }
 
 func (filters FieldFilters) String() string {
@@ -45,49 +64,6 @@ func (filters FieldFilters) String() string {
 	}
 	s += "}\r\n"
 	return s
-}
-
-// fieldStr is a string in the format NNNabc
-func (filters *FieldFilters) addFilter(fieldStr string) error {
-	if len(fieldStr) < 3 {
-		return errors.New("Invalid field string (too short)")
-	}
-	tag := fieldStr[0:3]
-	subfields := ""
-	if len(fieldStr) > 3 {
-		subfields = fieldStr[3:]
-	}
-	filter := FieldFilter{Tag: tag, Subfields: subfields}
-	filters.Fields = append(filters.Fields, filter)
-	return nil
-}
-
-// For a given list of fields, it returns only those that
-// match the filters. The filter is done by Tag and if
-// available by Sub Field.
-func (filters FieldFilters) Apply(fields Fields) Fields {
-	if len(filters.Fields) == 0 {
-		return fields
-	}
-
-	filtered := Fields{}
-	// for _, filter := range filters.Fields {
-	// 	// Process all the fields that match the tag
-	// 	// (there could be more than one)
-	// 	for _, field := range fields.Get(filter.Tag) {
-	// 		if len(filter.Subfields) == 0 {
-	// 			// add the value as-is, no need to filter by subfield
-	// 			filtered.Add(field)
-	// 		} else {
-	// 			//... filter the field by subfield
-	// 			filteredField := field
-	// 			filteredField.RawValue = ""
-	// 			filteredField.SubFields = field.SubFieldValues(filter.Subfields)
-	// 			filtered.Add(filteredField)
-	// 		}
-	// 	}
-	// }
-	return filtered
 }
 
 func (filters FieldFilters) IncludeField(name string) bool {
