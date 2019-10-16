@@ -82,11 +82,3 @@ func (filters FieldFilters) IncludeLeader() bool {
 	}
 	return filters.IncludeField("LDR")
 }
-
-func (filters FieldFilters) IncludeFileInfo() bool {
-	return filters.IncludeField("FIN")
-}
-
-func (filters FieldFilters) IncludeRecordInfo() bool {
-	return filters.IncludeField("RIN")
-}
