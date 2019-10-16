@@ -2,6 +2,7 @@ package marc
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Record is a struct representing a MARC record. It has a Fields slice
@@ -113,14 +114,15 @@ func (r Record) GetValue(tag string, subfield string) string {
 func (r Record) GetValues(tag string, subfield string) []string {
 	values := []string{}
 	for _, field := range r.FieldsByTag(tag) {
-		if subfield != "" {
+		if strings.TrimSpace(subfield) == "" {
 			// No subfield indicated, return the string version of the field
 			values = append(values, field.String())
-		}
-		for _, sub := range field.SubFields {
-			if sub.Code == subfield {
-				// Return the first instance of the requested subfield
-				values = append(values, sub.Value)
+		} else {
+			for _, sub := range field.SubFields {
+				if sub.Code == subfield {
+					// Return the first instance of the requested subfield
+					values = append(values, sub.Value)
+				}
 			}
 		}
 	}
