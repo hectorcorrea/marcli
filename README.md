@@ -33,6 +33,10 @@ A letter (or letters) after the field tag indicates to output only those
 subfields. For example "907xz" means output subfield "x" and "z" in
 field "907".
 
+The program supports a `format` parameter to output to other formats other than MARC line delimited (MRK) such as JSON or MARC binary. Notice that not all the features are avilable in all the formats yet.
+
+You can also pass `start` and `count` parameters to output only a range of MARC records.
+
 
 ## Sample data
 Files under `./data/` are small MARC files that I use for testing.
@@ -49,7 +53,7 @@ Download the code and play with it:
 git clone https://github.com/hectorcorrea/marcli.git
 cd marcli
 go build
-./marcli -file data/test_1a.mrc  
+./marcli -file data/test_1a.mrc
 ```
 
 
