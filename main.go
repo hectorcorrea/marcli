@@ -32,7 +32,9 @@ func main() {
 		// TODO: support filters in ToMrc exporter
 		err = export.ToMrc(fileName, searchValue, filters)
 	} else if format == "mrk" {
-		err = export.ToMrc(fileName, searchValue, filters)
+		err = export.ToMrk(fileName, searchValue, filters)
+	} else if format == "json" {
+		err = export.ToJson(fileName, searchValue, filters)
 	} else {
 		err = errors.New("Invalid format")
 	}
