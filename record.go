@@ -35,6 +35,11 @@ func (r Record) ControlNum() string {
 	return ""
 }
 
+func (r Record) Raw() []byte {
+	// Include the record terminator.
+	return append(r.Data, rt)
+}
+
 func (r Record) String() string {
 	return fmt.Sprintf("Leader: %s", r.Leader)
 }
