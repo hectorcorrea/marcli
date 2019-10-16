@@ -10,12 +10,16 @@ import (
 )
 
 var fileName, search, fields, format string
+var start, count int
 
 func init() {
 	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
 	flag.StringVar(&search, "match", "", "Only records that match the string passed, case insensitive.")
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
 	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, json, or solr.")
+	flag.IntVar(&start, "start", 1, "Number of first record to load")
+	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
+
 	flag.Parse()
 }
 
@@ -29,16 +33,13 @@ func main() {
 	searchValue := strings.ToLower(search)
 	filters := marc.NewFieldFilters(fields)
 	if format == "mrc" {
-		// TODO: support filters in ToMrc exporter
-		err = export.ToMrc(fileName, searchValue, filters)
+		err = export.ToMrc(fileName, searchValue, filters, start, count)
 	} else if format == "mrk" {
-		err = export.ToMrk(fileName, searchValue, filters)
+		err = export.ToMrk(fileName, searchValue, filters, start, count)
 	} else if format == "json" {
-		// TODO: support filters in ToJson exporter
-		err = export.ToJson(fileName, searchValue, filters)
+		err = export.ToJson(fileName, searchValue, filters, start, count)
 	} else if format == "solr" {
-		// TODO: support filters in ToSolr exporter
-		err = export.ToSolr(fileName, searchValue, filters)
+		err = export.ToSolr(fileName, searchValue, filters, start, count)
 	} else {
 		err = errors.New("Invalid format")
 	}

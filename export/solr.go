@@ -2,6 +2,7 @@ package export
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"marcli/marc"
@@ -61,17 +62,25 @@ func NewSolrDocument(r marc.Record) SolrDocument {
 	return doc
 }
 
-func ToSolr(filename string, searchValue string, filters marc.FieldFilters) error {
+func ToSolr(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+	if len(filters.Fields) > 0 {
+		return errors.New("filters not supported for this format")
+	}
+
+	if count == 0 {
+		return nil
+	}
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	count := 0
+	var i, out int
 	marc := marc.NewMarcFile(file)
 
-	fmt.Printf("[\r\n")
+	fmt.Printf("[")
 	for marc.Scan() {
 		r, err := marc.Record()
 		if err == io.EOF {
@@ -80,9 +89,14 @@ func ToSolr(filename string, searchValue string, filters marc.FieldFilters) erro
 		if err != nil {
 			return err
 		}
+		if i++; i < start {
+			continue
+		}
 		if r.Contains(searchValue) {
-			if count > 0 {
+			if out > 0 {
 				fmt.Printf(",\r\n")
+			} else {
+				fmt.Printf("\r\n")
 			}
 			doc := NewSolrDocument(r)
 			b, err := json.Marshal(doc)
@@ -90,7 +104,9 @@ func ToSolr(filename string, searchValue string, filters marc.FieldFilters) erro
 				fmt.Printf("%s\r\n", err)
 			}
 			fmt.Printf("%s", b)
-			count++
+			if out++; out == count {
+				break
+			}
 		}
 	}
 	fmt.Printf("\r\n]\r\n")

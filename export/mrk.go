@@ -7,13 +7,18 @@ import (
 	"os"
 )
 
-func ToMrk(filename string, searchValue string, filters marc.FieldFilters) error {
+func ToMrk(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+	if count == 0 {
+		return nil
+	}
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
+	var i, out int
 	marc := marc.NewMarcFile(file)
 	for marc.Scan() {
 
@@ -25,22 +30,23 @@ func ToMrk(filename string, searchValue string, filters marc.FieldFilters) error
 			return err
 		}
 
+		if i++; i < start {
+			continue
+		}
+
 		if r.Contains(searchValue) {
 			str := ""
 			if filters.IncludeLeader() {
 				str += fmt.Sprintf("%s\r\n", r.Leader)
 			}
-			// if filters.IncludeRecordInfo() {
-			// 	str += fmt.Sprintf("=RIN  pos=%d, length=%d, data offset=%d\r\n", r.Pos, r.Leader.Length, r.Leader.DataOffset)
-			// }
-			// if filters.IncludeFileInfo() {
-			// 	str += fmt.Sprintf("=FIN  %s\r\n", f.Name)
-			// }
 			for _, field := range r.Filter(filters) {
 				str += fmt.Sprintf("%s\r\n", field)
 			}
 			if str != "" {
 				fmt.Printf("%s\r\n", str)
+				if out++; out == count {
+					break
+				}
 			}
 		}
 	}
