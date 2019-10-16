@@ -87,3 +87,42 @@ func (r Record) FieldsByTag(tag string) []Field {
 	}
 	return fields
 }
+
+// GetValue returns the first value for a field tag/subfield combination.
+func (r Record) GetValue(tag string, subfield string) string {
+	for _, field := range r.FieldsByTag(tag) {
+		if field.IsControlField() {
+			return field.Value
+		}
+		if subfield == "" {
+			// No subfield indicated, return the string version of the field
+			// TODO: Return the values rather than "=NNN \\ $aAAA $bBBB"
+			return field.String()
+		}
+		for _, sub := range field.SubFields {
+			if sub.Code == subfield {
+				// Return the first instance of the requested subfield
+				return sub.Value
+			}
+		}
+	}
+	return ""
+}
+
+// GetValues returns the values that match the field tag/subfield combination.
+func (r Record) GetValues(tag string, subfield string) []string {
+	values := []string{}
+	for _, field := range r.FieldsByTag(tag) {
+		if subfield != "" {
+			// No subfield indicated, return the string version of the field
+			values = append(values, field.String())
+		}
+		for _, sub := range field.SubFields {
+			if sub.Code == subfield {
+				// Return the first instance of the requested subfield
+				values = append(values, sub.Value)
+			}
+		}
+	}
+	return values
+}

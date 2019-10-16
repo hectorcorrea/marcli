@@ -36,6 +36,9 @@ func main() {
 	} else if format == "json" {
 		// TODO: support filters in ToJson exporter
 		err = export.ToJson(fileName, searchValue, filters)
+	} else if format == "solr" {
+		// TODO: support filters in ToSolr exporter
+		err = export.ToSolr(fileName, searchValue, filters)
 	} else {
 		err = errors.New("Invalid format")
 	}
