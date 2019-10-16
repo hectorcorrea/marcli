@@ -1,19 +1,20 @@
-package main
+package export
 
 import (
 	"fmt"
 	"io"
+	"marcli/marc"
 	"os"
 )
 
-func mrkProcessor(filename string, searchValue string, filters FieldFilters) error {
+func ToMrk(filename string, searchValue string, filters marc.FieldFilters) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	marc := NewMarcFile(file)
+	marc := marc.NewMarcFile(file)
 	for marc.Scan() {
 
 		r, err := marc.Record()

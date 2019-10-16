@@ -1,19 +1,20 @@
-package main
+package export
 
 import (
 	"fmt"
 	"io"
+	"marcli/marc"
 	"os"
 )
 
-func mrcProcessor(filename string, searchValue string, filters FieldFilters) error {
+func ToMrc(filename string, searchValue string, filters marc.FieldFilters) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	marc := NewMarcFile(file)
+	marc := marc.NewMarcFile(file)
 	for marc.Scan() {
 		r, err := marc.Record()
 		if err == io.EOF {
@@ -22,7 +23,6 @@ func mrcProcessor(filename string, searchValue string, filters FieldFilters) err
 		if err != nil {
 			return err
 		}
-
 		if r.Contains(searchValue) {
 			fmt.Printf("%s", r.Raw())
 		}

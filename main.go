@@ -4,6 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"marcli/export"
+	"marcli/marc"
 	"strings"
 )
 
@@ -25,11 +27,12 @@ func main() {
 	}
 	var err error
 	searchValue := strings.ToLower(search)
-	filters := NewFieldFilters(fields)
+	filters := marc.NewFieldFilters(fields)
 	if format == "mrc" {
-		err = mrcProcessor(fileName, searchValue, filters)
+		// TODO: support filters in ToMrc exporter
+		err = export.ToMrc(fileName, searchValue, filters)
 	} else if format == "mrk" {
-		err = mrkProcessor(fileName, searchValue, filters)
+		err = export.ToMrc(fileName, searchValue, filters)
 	} else {
 		err = errors.New("Invalid format")
 	}
