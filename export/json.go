@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+// TODO: Add support for JSONL (JSON line delimited) format that makes JSON
+// easier to parse with Unix tools like grep, tail, and so on.
 func ToJson(filename string, searchValue string, filters marc.FieldFilters) error {
 	file, err := os.Open(filename)
 	if err != nil {
