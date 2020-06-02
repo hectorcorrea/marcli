@@ -3,26 +3,43 @@ package marc
 import (
 	"bufio"
 	"bytes"
+	"encoding/xml"
 	"errors"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const (
-	rt = 0x1d // End of record
-	st = 0x1f // End of subfield
+	rt = 0x1d // End of record (MARC binary)
+	st = 0x1f // End of subfield (MARC binary)
 )
 
 // MarcFile represents a MARC file.
-// The public interface more or less mimic Go's native Scanner (Scan, Err, Text)
+// The public interface more or less mimic Go's native Scanner (Scan, Err)
+// but uses Record (instead of Text) to represent each MARC record.
 type MarcFile struct {
 	scanner *bufio.Scanner
+	decoder *xml.Decoder
+	isXML   bool
+	element xml.StartElement
 }
 
-// NewMarcFile creates a scanner to manage reading the contents
-// of the MARC file using Go's native Scanner interface.
-// (stolen from https://github.com/MITLibraries/fml)
+// NewMarcFile creates a struct to handle reading the MARC file.
 func NewMarcFile(file *os.File) MarcFile {
+
+	isXML := strings.HasSuffix(strings.ToLower(file.Name()), ".xml")
+	if isXML {
+		// For MARC XML files it uses a Decoder() to read one
+		// MARC record at a time.
+		decoder := xml.NewDecoder(file)
+		return MarcFile{decoder: decoder, isXML: true}
+	}
+
+	// Assume MARC binary
+	//
+	// For MARC binary files uses a Scanner() to read the
+	// contents of the file (stolen from https://github.com/MITLibraries/fml)
 	scanner := bufio.NewScanner(file)
 
 	// By default Scanner.Scan() returns "bufio.Scanner: token too long" if
@@ -54,19 +71,69 @@ func splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 // Err returns the error in the scanner (if any)
 func (file *MarcFile) Err() error {
+	if file.isXML {
+		return nil
+	}
 	return file.scanner.Err()
 }
 
 // Scan moves the scanner to the next record.
 // Returns false when no more records can be read.
 func (file *MarcFile) Scan() bool {
+
+	if file.isXML {
+		for {
+			token, _ := file.decoder.Token()
+			if token == nil {
+				return false
+			}
+			// Find the next "<record>" element in the XML
+			// and store it.
+			element, ok := token.(xml.StartElement)
+			if ok && element.Name.Local == "record" {
+				file.element = element
+				return true
+			}
+		}
+	}
+
 	return file.scanner.Scan()
 }
 
 // Record returns the current Record in the MarcFile.
 func (file *MarcFile) Record() (Record, error) {
-	bytes := file.scanner.Bytes()
 	rec := Record{}
+
+	if file.isXML {
+		// Decode the last element found in Scan() into an XML Record...
+		var xmlRec XmlRecord
+		file.decoder.DecodeElement(&xmlRec, &file.element)
+
+		leader, err := NewLeader([]byte(xmlRec.Leader))
+		if err != nil {
+			return rec, err
+		}
+		rec.Leader = leader
+		rec.Data = []byte("Raw data not supported in XML format\n")
+
+		// ...and then into a MARC Record.
+		for _, control := range xmlRec.ControlFields {
+			field := Field{Tag: control.Tag, Value: control.Value}
+			rec.Fields = append(rec.Fields, field)
+		}
+		for _, data := range xmlRec.DataFields {
+			field := Field{Tag: data.Tag, Indicator1: data.Ind1, Indicator2: data.Ind2}
+			for _, sub := range data.SubFields {
+				subfield := SubField{Code: sub.Code, Value: sub.Value}
+				field.SubFields = append(field.SubFields, subfield)
+			}
+			rec.Fields = append(rec.Fields, field)
+		}
+		return rec, nil
+	}
+
+	// Parse the bytes from the scanner to create the MARC Record.
+	bytes := file.scanner.Bytes()
 	rec.Data = append([]byte(nil), bytes...)
 
 	leader, err := NewLeader(bytes[0:24])
