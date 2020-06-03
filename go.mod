@@ -1,3 +1,3 @@
-module marcli
+module hectorcorrea/marcli
 
 go 1.14

@@ -3,8 +3,6 @@ MARC command line (marcli) is a toy project that I am working on to help me deal
 
 The basic idea is to create a program that I can run on our Linux servers to parse our very large MARC files. The goal is to be able to copy a single file to our servers to parse these MARC files, find records that match certain criteria and export them for further review.
 
-This program is heavily inspired by amazing work that Terry Reese has done on [MarcEdit](http://marcedit.reeset.net/). This program is not a replacement for MarcEdit.
-
 The code is written in Go. I've found Go a very interesting and powerful programming language. Go's standard library provides most of the functionality that I need to parse MARC files. Go also supports creating binaries that can be deployed to Mac/Linux/Windows as single executable files which I love because I can deploy my executable to our Linux servers without having to do a complicated installation (i.e. no JVM needed, or Ruby bundle).
 
 
@@ -41,9 +39,10 @@ You can also pass `start` and `count` parameters to output only a range of MARC 
 ## Sample data
 Files under `./data/` are small MARC files that I use for testing.
 
-* test_10.mrc has 10 MARC records
-* test_1a.mrc is the first record of test_10.mrc
-* test_1b.mrc is the second record of test_10.mrc
+* test_10.mrc has 10 MARC records (MARC binary)
+* test_1a.mrc is the first record of test_10.mrc  (MARC binary)
+* test_1b.mrc is the second record of test_10.mrc  (MARC binary)
+* small.xml has 10 MARC record (MARC XML)
 
 
 ## Getting started with the code
@@ -51,11 +50,15 @@ Download the code and play with it:
 
 ```
 git clone https://github.com/hectorcorrea/marcli.git
-cd marcli
+cd marcli/cmd/marcli
 go build
 ./marcli -file data/test_1a.mrc
 ```
 
+## Code Structure
+
+* `cmd/marcli` contains the code for the command line interface.
+* `pkg/marc` contains the code to parse MARC files.
 
 ## Getting started (without the source code)
 If you don't care about the source code, you can download the binary file appropriated for your operating system from the [releases tab](https://github.com/hectorcorrea/marcli/releases) and run it.

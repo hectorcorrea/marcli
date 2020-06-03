@@ -1,17 +1,17 @@
-package export
+package main
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hectorcorrea/marcli/pkg/marc"
 	"io"
-	"marcli/marc"
 	"os"
 )
 
 // TODO: Add support for JSONL (JSON line delimited) format that makes JSON
 // easier to parse with Unix tools like grep, tail, and so on.
-func ToJson(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+func toJson(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
 	if len(filters.Fields) > 0 {
 		return errors.New("filters not supported for this format")
 	}

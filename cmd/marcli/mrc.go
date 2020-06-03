@@ -1,14 +1,14 @@
-package export
+package main
 
 import (
 	"errors"
 	"fmt"
+	"hectorcorrea/marcli/pkg/marc"
 	"io"
-	"marcli/marc"
 	"os"
 )
 
-func ToMrc(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+func toMrc(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
 	if len(filters.Fields) > 0 {
 		return errors.New("filters not supported for this format")
 	}

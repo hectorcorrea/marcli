@@ -1,13 +1,13 @@
-package export
+package main
 
 import (
 	"fmt"
+	"hectorcorrea/marcli/pkg/marc"
 	"io"
-	"marcli/marc"
 	"os"
 )
 
-func ToMrk(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+func toMrk(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
 	if count == 0 {
 		return nil
 	}

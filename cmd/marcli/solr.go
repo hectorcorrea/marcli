@@ -1,11 +1,11 @@
-package export
+package main
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hectorcorrea/marcli/pkg/marc"
 	"io"
-	"marcli/marc"
 	"os"
 	"strings"
 )
@@ -62,7 +62,7 @@ func NewSolrDocument(r marc.Record) SolrDocument {
 	return doc
 }
 
-func ToSolr(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+func toSolr(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
 	if len(filters.Fields) > 0 {
 		return errors.New("filters not supported for this format")
 	}

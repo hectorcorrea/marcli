@@ -4,8 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"marcli/export"
-	"marcli/marc"
+	"hectorcorrea/marcli/pkg/marc"
 	"strings"
 )
 
@@ -33,13 +32,13 @@ func main() {
 	searchValue := strings.ToLower(search)
 	filters := marc.NewFieldFilters(fields)
 	if format == "mrc" {
-		err = export.ToMrc(fileName, searchValue, filters, start, count)
+		err = toMrc(fileName, searchValue, filters, start, count)
 	} else if format == "mrk" {
-		err = export.ToMrk(fileName, searchValue, filters, start, count)
+		err = toMrk(fileName, searchValue, filters, start, count)
 	} else if format == "json" {
-		err = export.ToJson(fileName, searchValue, filters, start, count)
+		err = toJson(fileName, searchValue, filters, start, count)
 	} else if format == "solr" {
-		err = export.ToSolr(fileName, searchValue, filters, start, count)
+		err = toSolr(fileName, searchValue, filters, start, count)
 	} else {
 		err = errors.New("Invalid format")
 	}
