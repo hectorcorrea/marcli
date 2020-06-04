@@ -42,17 +42,18 @@ Files under `./data/` are small MARC files that I use for testing.
 * test_10.mrc has 10 MARC records (MARC binary)
 * test_1a.mrc is the first record of test_10.mrc  (MARC binary)
 * test_1b.mrc is the second record of test_10.mrc  (MARC binary)
-* small.xml has 10 MARC record (MARC XML)
+* small.xml has 10 MARC records (MARC XML)
 
 
 ## Getting started with the code
 Download the code and play with it:
 
 ```
+cd ~/src
 git clone https://github.com/hectorcorrea/marcli.git
 cd marcli/cmd/marcli
 go build
-./marcli -file data/test_1a.mrc
+./marcli -file ~/src/marcli/data/test_1a.mrc
 ```
 
 ## Code Structure

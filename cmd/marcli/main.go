@@ -4,8 +4,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"hectorcorrea/marcli/pkg/marc"
 	"strings"
+
+	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
 var fileName, search, fields, format string

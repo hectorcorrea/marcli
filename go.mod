@@ -1,3 +1,3 @@
-module hectorcorrea/marcli
+module github.com/hectorcorrea/marcli
 
 go 1.14

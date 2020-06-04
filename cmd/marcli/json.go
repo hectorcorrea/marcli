@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"hectorcorrea/marcli/pkg/marc"
 	"io"
 	"os"
+
+	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
 // TODO: Add support for JSONL (JSON line delimited) format that makes JSON

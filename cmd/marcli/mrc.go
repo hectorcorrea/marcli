@@ -3,9 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"hectorcorrea/marcli/pkg/marc"
 	"io"
 	"os"
+
+	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
 func toMrc(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {

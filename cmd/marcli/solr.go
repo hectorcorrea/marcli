@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"hectorcorrea/marcli/pkg/marc"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
 type SolrDocument struct {
