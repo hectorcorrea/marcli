@@ -25,11 +25,13 @@ func NewLeader(bytes []byte) (Leader, error) {
 		return Leader{}, errors.New("Incomplete leader")
 	}
 
-	// length, _ := strconv.Atoi(string(bytes[0:5]))
+	// A typical good leader value is: "01848nam  2200385 i 4500"
+	// where as a bad value would be.: "ZZZZZnamZa22ZZZZZzZZ4500"
 	offset, err := strconv.Atoi(string(bytes[12:17]))
 	if err != nil {
 		msg := fmt.Sprintf("Could not determine data offset from leader (%s)", string(bytes))
-		return Leader{}, errors.New(msg)
+		err = errors.New(msg)
+		offset = -1
 	}
 
 	leader := Leader{
@@ -43,7 +45,7 @@ func NewLeader(bytes []byte) (Leader, error) {
 		Form:          bytes[18],
 		Multipart:     bytes[19],
 	}
-	return leader, nil
+	return leader, err
 }
 
 func (l Leader) String() string {

@@ -109,10 +109,9 @@ func (file *MarcFile) Record() (Record, error) {
 		var xmlRec XmlRecord
 		file.decoder.DecodeElement(&xmlRec, &file.element)
 
-		leader, err := NewLeader([]byte(xmlRec.Leader))
-		if err != nil {
-			return rec, err
-		}
+		// Ignore error because a bad data offset is not a problem
+		// in XML records.
+		leader, _ := NewLeader([]byte(xmlRec.Leader))
 		rec.Leader = leader
 		rec.Data = []byte("Raw data not supported in XML format\n")
 
