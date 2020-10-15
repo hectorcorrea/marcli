@@ -31,6 +31,13 @@ A letter (or letters) after the field tag indicates to output only those
 subfields. For example "907xz" means output subfield "x" and "z" in
 field "907".
 
+You can also filter based on the presence of certain fields in the MARC record (regardless of their value), for example the following will only output records
+that have a MARC 110 field:
+
+```
+./marcli -file data/test_10.mrc -hasFields 110
+```
+
 The program supports a `format` parameter to output to other formats other than MARC line delimited (MRK) such as JSON or MARC binary. Notice that not all the features are avilable in all the formats yet.
 
 You can also pass `start` and `count` parameters to output only a range of MARC records.
