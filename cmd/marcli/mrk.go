@@ -8,12 +8,12 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
-func toMrk(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
+func toMrk(params ProcessFileParams) error {
 	if count == 0 {
 		return nil
 	}
 
-	file, err := os.Open(filename)
+	file, err := os.Open(params.filename)
 	if err != nil {
 		return err
 	}
@@ -35,12 +35,12 @@ func toMrk(filename string, searchValue string, filters marc.FieldFilters, start
 			continue
 		}
 
-		if r.Contains(searchValue) {
+		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
 			str := ""
-			if filters.IncludeLeader() {
+			if params.filters.IncludeLeader() {
 				str += fmt.Sprintf("%s\r\n", r.Leader)
 			}
-			for _, field := range r.Filter(filters) {
+			for _, field := range r.Filter(params.filters) {
 				str += fmt.Sprintf("%s\r\n", field)
 			}
 			if str != "" {

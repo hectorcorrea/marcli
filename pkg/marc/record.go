@@ -26,6 +26,11 @@ func (r Record) Contains(searchValue string) bool {
 	return false
 }
 
+// HasFields returns true if the Record contains the fields indicated
+func (r Record) HasFields(filters FieldFilters) bool {
+	return len(r.Filter(filters)) > 0
+}
+
 // ControlNum returns the control number (tag 001) for the record.
 func (r Record) ControlNum() string {
 	for _, f := range r.Fields {
@@ -70,7 +75,9 @@ func (r Record) Filter(filters FieldFilters) []Field {
 					Indicator2: field.Indicator2,
 					SubFields:  field.GetSubFields(filter.Subfields),
 				}
-				list = append(list, filteredField)
+				if len(filteredField.SubFields) > 0 {
+					list = append(list, filteredField)
+				}
 			}
 		}
 	}

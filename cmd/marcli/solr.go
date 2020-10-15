@@ -63,8 +63,8 @@ func NewSolrDocument(r marc.Record) SolrDocument {
 	return doc
 }
 
-func toSolr(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
-	if len(filters.Fields) > 0 {
+func toSolr(params ProcessFileParams) error {
+	if len(params.filters.Fields) > 0 {
 		return errors.New("filters not supported for this format")
 	}
 
@@ -72,7 +72,7 @@ func toSolr(filename string, searchValue string, filters marc.FieldFilters, star
 		return nil
 	}
 
-	file, err := os.Open(filename)
+	file, err := os.Open(params.filename)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func toSolr(filename string, searchValue string, filters marc.FieldFilters, star
 		if i++; i < start {
 			continue
 		}
-		if r.Contains(searchValue) {
+		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
 			if out > 0 {
 				fmt.Printf(",\r\n")
 			} else {

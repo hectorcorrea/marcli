@@ -12,8 +12,8 @@ import (
 
 // TODO: Add support for JSONL (JSON line delimited) format that makes JSON
 // easier to parse with Unix tools like grep, tail, and so on.
-func toJson(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
-	if len(filters.Fields) > 0 {
+func toJson(params ProcessFileParams) error {
+	if len(params.filters.Fields) > 0 {
 		return errors.New("filters not supported for this format")
 	}
 
@@ -21,7 +21,7 @@ func toJson(filename string, searchValue string, filters marc.FieldFilters, star
 		return nil
 	}
 
-	file, err := os.Open(filename)
+	file, err := os.Open(params.filename)
 	if err != nil {
 		return err
 	}
@@ -42,13 +42,13 @@ func toJson(filename string, searchValue string, filters marc.FieldFilters, star
 		if i++; i < start {
 			continue
 		}
-		if r.Contains(searchValue) {
+		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
 			if out > 0 {
 				fmt.Printf(",\r\n")
 			} else {
 				fmt.Printf("\r\n")
 			}
-			b, err := json.Marshal(r.Filter(filters))
+			b, err := json.Marshal(r.Filter(params.filters))
 			if err != nil {
 				fmt.Printf("%s\r\n", err)
 			}

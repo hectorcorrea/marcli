@@ -9,8 +9,8 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
-func toMrc(filename string, searchValue string, filters marc.FieldFilters, start int, count int) error {
-	if len(filters.Fields) > 0 {
+func toMrc(params ProcessFileParams) error {
+	if len(params.filters.Fields) > 0 {
 		return errors.New("filters not supported for this format")
 	}
 
@@ -18,7 +18,7 @@ func toMrc(filename string, searchValue string, filters marc.FieldFilters, start
 		return nil
 	}
 
-	file, err := os.Open(filename)
+	file, err := os.Open(params.filename)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func toMrc(filename string, searchValue string, filters marc.FieldFilters, start
 			continue
 		}
 
-		if r.Contains(searchValue) {
+		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
 			fmt.Printf("%s", r.Raw())
 			if out++; out == count {
 				break

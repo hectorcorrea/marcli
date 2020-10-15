@@ -9,41 +9,62 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
-var fileName, search, fields, format string
+var fileName, search, fields, format, hasFields string
 var start, count int
 
 func init() {
 	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
-	flag.StringVar(&search, "match", "", "Only records that match the string passed, case insensitive.")
+	flag.StringVar(&search, "match", "", "String that must be present in the content of the record, case insensitive.")
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
 	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, json, or solr.")
 	flag.IntVar(&start, "start", 1, "Number of first record to load")
 	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
-
+	flag.StringVar(&hasFields, "hasFields", "", "Comma delimited list of fields that must be present in the record.")
 	flag.Parse()
 }
 
 func main() {
 	if fileName == "" {
-		fmt.Printf("marcli parameters:\r\n")
-		flag.PrintDefaults()
+		showSyntax()
 		return
 	}
+
+	params := ProcessFileParams{
+		filename:    fileName,
+		searchValue: strings.ToLower(search),
+		filters:     marc.NewFieldFilters(fields),
+		start:       start,
+		count:       count,
+		hasFields:   marc.NewFieldFilters(hasFields),
+	}
+
 	var err error
-	searchValue := strings.ToLower(search)
-	filters := marc.NewFieldFilters(fields)
 	if format == "mrc" {
-		err = toMrc(fileName, searchValue, filters, start, count)
+		err = toMrc(params)
 	} else if format == "mrk" {
-		err = toMrk(fileName, searchValue, filters, start, count)
+		err = toMrk(params)
 	} else if format == "json" {
-		err = toJson(fileName, searchValue, filters, start, count)
+		err = toJson(params)
 	} else if format == "solr" {
-		err = toSolr(fileName, searchValue, filters, start, count)
+		err = toSolr(params)
 	} else {
 		err = errors.New("Invalid format")
 	}
 	if err != nil {
 		panic(err)
 	}
+}
+
+func showSyntax() {
+	fmt.Printf("marcli parameters:\r\n")
+	fmt.Printf("\r\n")
+	flag.PrintDefaults()
+	fmt.Printf("\r\n")
+	fmt.Printf(`
+NOTES:
+	The match parameter is used to filter records based on the content of the
+values in the record. The hasFields parameter is used to filter records based
+on the presence of certain fields on the record (regardless of their value).`)
+	fmt.Printf("\r\n")
+	fmt.Printf("\r\n")
 }
