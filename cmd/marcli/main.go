@@ -11,6 +11,7 @@ import (
 
 var fileName, search, fields, format, hasFields string
 var start, count int
+var debug bool
 
 func init() {
 	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
@@ -20,6 +21,7 @@ func init() {
 	flag.IntVar(&start, "start", 1, "Number of first record to load")
 	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
 	flag.StringVar(&hasFields, "hasFields", "", "Comma delimited list of fields that must be present in the record.")
+	flag.BoolVar(&debug, "debug", false, "When true it does not stop on errors")
 	flag.Parse()
 }
 
@@ -36,6 +38,7 @@ func main() {
 		start:       start,
 		count:       count,
 		hasFields:   marc.NewFieldFilters(hasFields),
+		debug:       debug,
 	}
 
 	var err error

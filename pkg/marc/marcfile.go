@@ -5,14 +5,17 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
+// See https://www.loc.gov/marc/specifications/specrecstruc.html
 const (
 	rt = 0x1d // End of record (MARC binary)
 	st = 0x1f // End of subfield (MARC binary)
+	ft = 0x1e // Field terminator (MARC binary)
 )
 
 // MarcFile represents a MARC file.
@@ -132,18 +135,17 @@ func (file *MarcFile) Record() (Record, error) {
 	}
 
 	// Parse the bytes from the scanner to create the MARC Record.
-	bytes := file.scanner.Bytes()
-	rec.Data = append([]byte(nil), bytes...)
-
-	leader, err := NewLeader(bytes[0:24])
+	recBytes := file.scanner.Bytes()
+	rec.Data = append([]byte(nil), recBytes...)
+	leader, err := NewLeader(recBytes[0:24])
 	if err != nil {
 		return rec, err
 	}
 	rec.Leader = leader
 
 	start := leader.dataOffset
-	data := bytes[start:]
-	dirs := bytes[24 : start-1]
+	data := recBytes[start:]
+	dirs := recBytes[24 : start-1]
 
 	for len(dirs) >= 12 {
 		tag := string(dirs[:3])
@@ -156,7 +158,9 @@ func (file *MarcFile) Record() (Record, error) {
 			return rec, errors.New("Could not determine field start")
 		}
 		if len(data) <= begin+length-1 {
-			return rec, errors.New("Reported field length incorrect")
+			details := fmt.Sprintf("Tag: %s, len(data): %d, begin: %d, field length: %d",
+				tag, len(data), begin, length)
+			return rec, errors.New("Reported field length incorrect.\n" + details + "\n")
 		}
 		fdata := data[begin : begin+length-1] // length includes field terminator
 		df, err := MakeField(tag, fdata)

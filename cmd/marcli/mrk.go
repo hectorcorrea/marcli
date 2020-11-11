@@ -27,7 +27,23 @@ func toMrk(params ProcessFileParams) error {
 		if err == io.EOF {
 			break
 		}
+
 		if err != nil {
+			str := "== RECORD WITH ERROR STARTS HERE\n"
+			str += "ERROR:\n"
+			str += err.Error() + "\n"
+			str += "PARSED:\n"
+			str += fmt.Sprintf("%s\r\n", r.Leader)
+			for _, field := range r.Fields {
+				str += fmt.Sprintf("%s\r\n", field)
+			}
+			str += "BINARY:\n"
+			str += fmt.Sprintf("%s\n", r.Data)
+			str += "== RECORD WITH ERROR ENDS HERE\n\n"
+			fmt.Print(str)
+			if params.debug {
+				continue
+			}
 			return err
 		}
 

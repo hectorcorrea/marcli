@@ -11,4 +11,5 @@ type ProcessFileParams struct {
 	start       int
 	count       int
 	hasFields   marc.FieldFilters
+	debug       bool
 }
