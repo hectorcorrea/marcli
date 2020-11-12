@@ -28,7 +28,8 @@ func (r Record) Contains(searchValue string) bool {
 
 // HasFields returns true if the Record contains the fields indicated
 func (r Record) HasFields(filters FieldFilters) bool {
-	return len(r.Filter(filters)) > 0
+	exclude := FieldFilters{}
+	return len(r.Filter(filters, exclude)) > 0
 }
 
 // ControlNum returns the control number (tag 001) for the record.
@@ -52,11 +53,20 @@ func (r Record) String() string {
 
 // Filter returns the fields in the record that match
 // the given filter.
-func (r Record) Filter(filters FieldFilters) []Field {
-	if len(filters.Fields) == 0 {
+func (r Record) Filter(include FieldFilters, exclude FieldFilters) []Field {
+	if len(include.Fields) == 0 && len(exclude.Fields) == 0 {
+		// Nothing to filter
 		return r.Fields
 	}
 
+	if len(include.Fields) > 0 {
+		return r.filterInclude(include)
+	}
+
+	return r.filterExclude(exclude)
+}
+
+func (r Record) filterInclude(filters FieldFilters) []Field {
 	list := []Field{}
 	for _, filter := range filters.Fields {
 		// Get all the fields in the record that match the tag
@@ -81,7 +91,26 @@ func (r Record) Filter(filters FieldFilters) []Field {
 			}
 		}
 	}
+	return list
+}
 
+func (r Record) filterExclude(filters FieldFilters) []Field {
+	list := []Field{}
+	for _, field := range r.Fields {
+		include := true
+		for _, filter := range filters.Fields {
+			if len(filter.Subfields) > 0 {
+				panic("Exclude filter by subfields not supported yet")
+			}
+			if filter.Tag == field.Tag {
+				include = false
+				break
+			}
+		}
+		if include {
+			list = append(list, field)
+		}
+	}
 	return list
 }
 

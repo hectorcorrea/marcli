@@ -56,7 +56,7 @@ func toMrk(params ProcessFileParams) error {
 			if params.filters.IncludeLeader() {
 				str += fmt.Sprintf("%s\r\n", r.Leader)
 			}
-			for _, field := range r.Filter(params.filters) {
+			for _, field := range r.Filter(params.filters, params.exclude) {
 				str += fmt.Sprintf("%s\r\n", field)
 			}
 			if str != "" {

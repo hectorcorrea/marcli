@@ -10,7 +10,7 @@ import (
 )
 
 func toMrc(params ProcessFileParams) error {
-	if len(params.filters.Fields) > 0 {
+	if params.HasFilters() {
 		return errors.New("filters not supported for this format")
 	}
 

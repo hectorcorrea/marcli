@@ -9,7 +9,7 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
-var fileName, search, fields, format, hasFields string
+var fileName, search, fields, exclude, format, hasFields string
 var start, count int
 var debug bool
 
@@ -17,6 +17,7 @@ func init() {
 	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
 	flag.StringVar(&search, "match", "", "String that must be present in the content of the record, case insensitive.")
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
+	flag.StringVar(&exclude, "exclude", "", "Comma delimited list of fields to exclude from the output.")
 	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, json, or solr.")
 	flag.IntVar(&start, "start", 1, "Number of first record to load")
 	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
@@ -35,10 +36,15 @@ func main() {
 		filename:    fileName,
 		searchValue: strings.ToLower(search),
 		filters:     marc.NewFieldFilters(fields),
+		exclude:     marc.NewFieldFilters(exclude),
 		start:       start,
 		count:       count,
 		hasFields:   marc.NewFieldFilters(hasFields),
 		debug:       debug,
+	}
+
+	if len(params.filters.Fields) > 0 && len(params.exclude.Fields) > 0 {
+		panic("Cannot specify fields and exclude at the same time.")
 	}
 
 	var err error
@@ -67,7 +73,10 @@ func showSyntax() {
 NOTES:
 	The match parameter is used to filter records based on the content of the
 values in the record. The hasFields parameter is used to filter records based
-on the presence of certain fields on the record (regardless of their value).`)
+on the presence of certain fields on the record (regardless of their value).
+
+	You can only use the fields or exclude parameter, but not both.
+`)
 	fmt.Printf("\r\n")
 	fmt.Printf("\r\n")
 }
