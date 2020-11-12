@@ -56,6 +56,8 @@ func main() {
 		err = toJson(params)
 	} else if format == "solr" {
 		err = toSolr(params)
+	} else if format == "xml" {
+		err = toXML(params)
 	} else {
 		err = errors.New("Invalid format")
 	}

@@ -51,6 +51,17 @@ func (r Record) String() string {
 	return fmt.Sprintf("Leader: %s", r.Leader)
 }
 
+func (r Record) DebugString() string {
+	str := "PARSED:\n"
+	str += fmt.Sprintf("%s\r\n", r.Leader)
+	for _, field := range r.Fields {
+		str += fmt.Sprintf("%s\r\n", field)
+	}
+	str += "BINARY:\n"
+	str += fmt.Sprintf("%s", r.Data)
+	return str
+}
+
 // Filter returns the fields in the record that match
 // the given filter.
 func (r Record) Filter(include FieldFilters, exclude FieldFilters) []Field {

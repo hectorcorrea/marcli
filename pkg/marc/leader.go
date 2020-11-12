@@ -51,3 +51,7 @@ func NewLeader(bytes []byte) (Leader, error) {
 func (l Leader) String() string {
 	return fmt.Sprintf("=LDR  %s", string(l.raw))
 }
+
+func (l Leader) Raw() string {
+	return string(l.raw)
+}
