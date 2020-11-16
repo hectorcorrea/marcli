@@ -18,7 +18,7 @@ func init() {
 	flag.StringVar(&search, "match", "", "String that must be present in the content of the record, case insensitive.")
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
 	flag.StringVar(&exclude, "exclude", "", "Comma delimited list of fields to exclude from the output.")
-	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, json, or solr.")
+	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, xml, json, or solr.")
 	flag.IntVar(&start, "start", 1, "Number of first record to load")
 	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
 	flag.StringVar(&hasFields, "hasFields", "", "Comma delimited list of fields that must be present in the record.")
