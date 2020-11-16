@@ -50,7 +50,7 @@ Files under `./data/` are small MARC files that I use for testing.
 * test_10.mrc has 10 MARC records (MARC binary)
 * test_1a.mrc is the first record of test_10.mrc  (MARC binary)
 * test_1b.mrc is the second record of test_10.mrc  (MARC binary)
-* small.xml has 10 MARC records (MARC XML)
+* test_10.xml same as test_10.mrc but in MARC XML.
 
 
 ## Getting started with the code
