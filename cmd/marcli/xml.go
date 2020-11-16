@@ -71,7 +71,7 @@ func toXML(params ProcessFileParams) error {
 		}
 
 		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
-			str, err := recordToXML(r, params.debug)
+			str, err := recordToXML(r, params)
 			if err != nil {
 				if params.debug {
 					printError(r, "XML PARSE ERROR", err)
@@ -90,12 +90,12 @@ func toXML(params ProcessFileParams) error {
 	return marc.Err()
 }
 
-func recordToXML(r marc.Record, debug bool) (string, error) {
+func recordToXML(r marc.Record, params ProcessFileParams) (string, error) {
 	x := xmlRecord{
 		Leader: r.Leader.Raw(),
 	}
 
-	for _, f := range r.Fields {
+	for _, f := range r.Filter(params.filters, params.exclude) {
 		if f.IsControlField() {
 			x.ControlFields = append(x.ControlFields, controlField{Tag: f.Tag, Value: f.Value})
 		} else {
@@ -108,7 +108,7 @@ func recordToXML(r marc.Record, debug bool) (string, error) {
 	}
 
 	indent := ""
-	if debug {
+	if params.debug {
 		indent = " "
 	}
 	b, err := xml.MarshalIndent(x, indent, indent)
