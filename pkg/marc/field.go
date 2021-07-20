@@ -61,9 +61,9 @@ func MakeField(tag string, data []byte) (Field, error) {
 	}
 
 	for _, sf := range bytes.Split(data[3:], []byte{st}) {
-		if len(sf) > 0 {
+		if len(sf) > 1 {
 			f.SubFields = append(f.SubFields, SubField{string(sf[0]), string(sf[1:])})
-		} else {
+		} else if len(sf) == 1 {
 			return f, errors.New("Extraneous field terminator")
 		}
 	}
