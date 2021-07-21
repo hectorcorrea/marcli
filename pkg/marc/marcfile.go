@@ -168,11 +168,13 @@ func (file *MarcFile) Record() (Record, error) {
 			return rec, errors.New("Reported field length incorrect.\n" + details + "\n")
 		}
 		fdata := data[begin : begin+length-1] // length includes field terminator
-		df, err := MakeField(tag, fdata)
-		if err != nil {
-			return rec, err
+		if len(fdata) > 4 {                   // ignore illegal data
+			df, err := MakeField(tag, fdata)
+			if err != nil {
+				return rec, err
+			}
+			rec.Fields = append(rec.Fields, df)
 		}
-		rec.Fields = append(rec.Fields, df)
 		dirs = dirs[12:]
 	}
 	return rec, nil
