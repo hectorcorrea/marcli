@@ -144,6 +144,11 @@ func (file *MarcFile) Record() (Record, error) {
 	rec.Leader = leader
 
 	start := leader.dataOffset
+	if start <= 25 {
+		return rec, errors.New("Bad data offset")
+	} else if start > len(recBytes) {
+		return rec, errors.New("Bad record length")
+	}
 	data := recBytes[start:]
 	dirs := recBytes[24 : start-1]
 
