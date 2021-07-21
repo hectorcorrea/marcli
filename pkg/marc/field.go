@@ -60,11 +60,13 @@ func MakeField(tag string, data []byte) (Field, error) {
 		return f, errors.New("Invalid Indicators detected")
 	}
 
+	if len(data) < 4 { // Each data field contains at least one subfield code.
+		return f, errors.New("Bad SubFields length")
+	}
+
 	for _, sf := range bytes.Split(data[3:], []byte{st}) {
-		if len(sf) > 0 {
+		if len(sf) > 1 {
 			f.SubFields = append(f.SubFields, SubField{string(sf[0]), string(sf[1:])})
-		} else {
-			return f, errors.New("Extraneous field terminator")
 		}
 	}
 	return f, nil
