@@ -1,9 +1,28 @@
 ## What is this?
-MARC command line (marcli) is a toy project that I am working on to help me deal with MARC files and understand better how [MARC](https://www.loc.gov/marc/umb/um01to06.html) files are stored on disk.
+MARC command line (marcli) is a tool to parse [MARC](https://www.loc.gov/marc/umb/um01to06.html) files from the command line.
 
-The basic idea is to create a program that I can run on our Linux servers to parse our very large MARC files. The goal is to be able to copy a single file to our servers to parse these MARC files, find records that match certain criteria and export them for further review.
+The goal `marcli` is to allow a user to parse large MARC files in either MARC binary or MARC XML form and provide basic functionality to find specific records within a file.
 
-The code is written in Go. I've found Go a very interesting and powerful programming language. Go's standard library provides most of the functionality that I need to parse MARC files. Go also supports creating binaries that can be deployed to Mac/Linux/Windows as single executable files which I love because I can deploy my executable to our Linux servers without having to do a complicated installation (i.e. no JVM needed, or Ruby bundle).
+
+## Installation
+On the Mac the easiest way to install `marcli` is via Homebrew:
+
+```
+brew install marcli
+```
+
+Or by downloading the binary for your OS from the [releases tab](https://github.com/hectorcorrea/marcli/releases) and marking the downloaded file as an executable:
+
+```
+curl -L https://github.com/hectorcorrea/marcli/releases/download/1.0.1/marcli > marcli
+chmod u+x marcli
+```
+
+Once installed you can just run it via:
+
+```
+./marcli -file yourfile.mrc
+```
 
 
 ## Sample of usage
@@ -63,24 +82,17 @@ go build
 ./marcli -file ~/src/marcli/data/test_1a.mrc
 ```
 
+
 ## Code Structure
 
 * `cmd/marcli` contains the code for the command line interface.
 * `pkg/marc` contains the code to parse MARC files.
 
-## Getting started (without the source code)
-If you don't care about the source code, you can download the binary file appropriated for your operating system from the [releases tab](https://github.com/hectorcorrea/marcli/releases) and run it.
 
-The basic syntax is:
-
-```
-./marcli -file yourfile.mrc
-```
+## Bugs, feedback, ideas?
+If you find an issue parsing MARC files with `marcli` feel free to [submit an issue](https://github.com/hectorcorrea/marcli/issues) with details of the error, and if possible a sample file or contact me by email at hector@hectorcorrea.com
 
 
-## Warning
-I've only tested this program with a few internal MARC files and, although they are pretty big (400MB), I have no idea how well this program works with MARC files in the wild. Please keep this in mind if you download and play with it. And feel free to let me know if you run into any issues.
-
-
-## MARC information
-Understanding MARC: https://www.loc.gov/marc/umb/
+## More information
+* Code4Lib 2021 lightning talk ([slides](https://docs.google.com/presentation/d/1hkLx5zNZCXal20vzP3Jg_nZy03qCsLishHeVTecnsY0/edit?usp=sharing) and [video](https://youtu.be/jLg7XreYS4M?t=186))
+* Understanding MARC: https://www.loc.gov/marc/umb/
