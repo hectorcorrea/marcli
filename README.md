@@ -5,7 +5,7 @@ The goal `marcli` is to allow a user to parse large MARC files in either MARC bi
 
 
 ## Installation
-On the Mac the easiest way to install `marcli` is via Homebrew:
+On the Mac or Linux the easiest way to install `marcli` is via Homebrew:
 
 ```
 brew install marcli
@@ -14,7 +14,7 @@ brew install marcli
 Or by downloading the binary for your OS from the [releases tab](https://github.com/hectorcorrea/marcli/releases) and marking the downloaded file as an executable:
 
 ```
-curl -L https://github.com/hectorcorrea/marcli/releases/download/1.0.1/marcli > marcli
+curl -LO https://github.com/hectorcorrea/marcli/releases/latest/download/marcli
 chmod u+x marcli
 ```
 
