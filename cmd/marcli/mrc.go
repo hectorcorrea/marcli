@@ -39,7 +39,7 @@ func toMrc(params ProcessFileParams) error {
 			continue
 		}
 
-		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
+		if r.Contains(params.searchValue, params.searchFields) && r.HasFields(params.hasFields) {
 			fmt.Printf("%s", r.Raw())
 			if out++; out == count {
 				break

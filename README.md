@@ -9,6 +9,7 @@ On the Mac or Linux the easiest way to install `marcli` is via Homebrew:
 
 ```
 brew install marcli
+marcli -file yourfile.mrc
 ```
 
 Or by downloading the binary for your OS from the [releases tab](https://github.com/hectorcorrea/marcli/releases) and marking the downloaded file as an executable:
@@ -16,40 +17,38 @@ Or by downloading the binary for your OS from the [releases tab](https://github.
 ```
 curl -LO https://github.com/hectorcorrea/marcli/releases/latest/download/marcli
 chmod u+x marcli
-```
-
-Once installed you can just run it via:
-
-```
 ./marcli -file yourfile.mrc
 ```
 
+Notice that if you install `marcli` via Homebrew the executable will be on your path and you can run it just by typing `marcli` from any folder, whereas if you install it via cURL you need to indicate the path `./marcli`.
 
 ## Sample of usage
 
-Output MARC data to the console in a line delimited format:
+Output MARC data to the console in a line delimited format (`marcli` automatically detects whether the file provided is in MARC XML or MARC binary):
+
 ```
 ./marcli -file data/test_1a.mrc
+./marcli -file data/test_10.xml
 ```
-
-If the file extension is `.xml` the file is expected to be a MARC XML file, otherwise MARC binary is assumed.
 
 Extract MARC records on file that contain the string "wildlife"
 ```
 ./marcli -file data/test_10.mrc -match wildlife
 ```
 
-Extracts MARC records on file that contain the string "wildlife" but outputs only fields "LDR,001,040,245a,650" for each record.
+Extracts MARC records on file that contain the string "wildlife" but outputs only fields "LDR,001,040,245a,650" for each record, LDR means the leader of the MARC record. In the `-fields` parameter a letter (or letters) after the field tag indicates to output only those subfields. For example "907xz" means output subfield "x" and "z" in field "907".
 
 ```
 ./marcli -file data/test_10.mrc -match wildlife -fields LDR,010,040,245a,650
 ```
 
-LDR means the leader of the MARC record.
+The `-matchFields` parameter can be used to limit the fields where the match will be made:
 
-A letter (or letters) after the field tag indicates to output only those subfields. For example "907xz" means output subfield "x" and "z" in field "907".
+```
+./marcli -file=data/test_10.mrc -match=web -matchFields=530
+````
 
-You can also use the `exclude` option to indicate fields to exclude from the output (notice that only full subfields are supported here, e.g. 970 is accepted but not 970a)
+You can also use the `exclude` option to indicate fields to exclude from the output (notice that only full fields are supported here, e.g. 970 is accepted but not 970a)
 
 You can also filter based on the presence of certain fields in the MARC record (regardless of their value), for example the following will only output records that have a MARC 110 field:
 

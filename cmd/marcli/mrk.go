@@ -44,7 +44,7 @@ func toMrk(params ProcessFileParams) error {
 			continue
 		}
 
-		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
+		if r.Contains(params.searchValue, params.searchFields) && r.HasFields(params.hasFields) {
 			str := ""
 			if params.filters.IncludeLeader() {
 				str += fmt.Sprintf("%s\r\n", r.Leader)
