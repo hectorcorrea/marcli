@@ -14,11 +14,25 @@ type Record struct {
 }
 
 // Contains returns true if Record contains the value passed.
-func (r Record) Contains(searchValue string) bool {
+// If searchFieldList is an empty array it searches in all fields for the record
+// otherwise the search is limited to only the fields in the array.
+func (r Record) Contains(searchValue string, searchFieldsList []string) bool {
 	if searchValue == "" {
 		return true
 	}
-	for _, field := range r.Fields {
+
+	var searchFields []Field
+	if len(searchFieldsList) == 0 {
+		searchFields = r.Fields
+	} else {
+		for _, field := range r.Fields {
+			if r.arrayContains(searchFieldsList, field.Tag) {
+				searchFields = append(searchFields, field)
+			}
+		}
+	}
+
+	for _, field := range searchFields {
 		if field.Contains(searchValue) {
 			return true
 		}
@@ -174,4 +188,13 @@ func (r Record) GetValues(tag string, subfield string) []string {
 		}
 	}
 	return values
+}
+
+func (r Record) arrayContains(array []string, value string) bool {
+	for _, element := range array {
+		if element == value {
+			return true
+		}
+	}
+	return false
 }

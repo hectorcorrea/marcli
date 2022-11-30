@@ -70,7 +70,7 @@ func toXML(params ProcessFileParams) error {
 			continue
 		}
 
-		if r.Contains(params.searchValue) && r.HasFields(params.hasFields) {
+		if r.Contains(params.searchValue, params.searchFields) && r.HasFields(params.hasFields) {
 			str, err := recordToXML(r, params)
 			if err != nil {
 				if params.debug {
