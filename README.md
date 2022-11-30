@@ -1,7 +1,7 @@
 ## What is this?
 MARC command line (marcli) is a tool to parse [MARC](https://www.loc.gov/marc/umb/um01to06.html) files from the command line.
 
-The goal `marcli` is to allow a user to parse large MARC files in either MARC binary or MARC XML form and provide basic functionality to find specific records within a file.
+The goal of `marcli` is to allow a user to parse large MARC files in either MARC binary or MARC XML form and provide basic functionality to find specific records within a file.
 
 
 ## Installation
