@@ -14,18 +14,20 @@ import (
 type SolrDocument struct {
 	Id              string   `json:"id"`
 	Author          string   `json:"author_txt_en,omitempty"`
-	AuthorDate      string   `json:"authorDate_s,omitempty"`
-	AuthorFuller    string   `json:"authorFuller_txt_en,omitempty"`
-	AuthorsOther    []string `json:"authorsOther_txts_en,omitempty"`
+	AuthorDate      string   `json:"author_date_s,omitempty"`
+	AuthorFuller    string   `json:"author_fuller_txt_en,omitempty"`
+	AuthorsOther    []string `json:"authors_other_txts_en,omitempty"`
 	Title           string   `json:"title_txt_en,omitempty"`
 	Responsibility  string   `json:"responsibility_txt_en,omitempty"`
-	Publisher       string   `json:"publisher_txt_en,omitempty"`
+	PublisherPlace  string   `json:"publisher_place_str,omitempty"`
+	PublisherName   string   `json:"publisher_name_str,omitempty"`
+	PublisherDate   string   `json:"publisher_date_str,omitempty"`
 	Urls            []string `json:"urls_ss,omitempty"`
 	Subjects        []string `json:"subjects_txts_en,omitempty"`
-	SubjectsForm    []string `json:"subjectsForm_txts_en,omitempty"`
-	SubjectsGeneral []string `json:"subjectsGeneral_txts_en,omitempty"`
-	SubjectsChrono  []string `json:"subjectsChrono_txts_en,omitempty"`
-	SubjectsGeo     []string `json:"subjectsGeo_txts_en,omitempty"`
+	SubjectsForm    []string `json:"subjects_form_txts_en,omitempty"`
+	SubjectsGeneral []string `json:"subjects_general_txts_en,omitempty"`
+	SubjectsChrono  []string `json:"subjects_chrono_txts_en,omitempty"`
+	SubjectsGeo     []string `json:"subjects_geo_txts_en,omitempty"`
 }
 
 func NewSolrDocument(r marc.Record) SolrDocument {
@@ -53,7 +55,9 @@ func NewSolrDocument(r marc.Record) SolrDocument {
 	doc.Title = concat(titleA, titleB)
 	doc.Responsibility = titleC
 
-	doc.Publisher = r.GetValue("260", "a")
+	doc.PublisherPlace = r.GetValue("260", "a")
+	doc.PublisherName = r.GetValue("260", "b")
+	doc.PublisherDate = r.GetValue("260", "c")
 	doc.Urls = r.GetValues("856", "u")
 	doc.Subjects = subjects(r, "a")
 	doc.SubjectsForm = subjects(r, "v")
