@@ -1,5 +1,6 @@
 /tmp/*
 .DS_Store
+*.out
 # ignore the executables
 /cmd/marcli/marcli
 /cmd/marcli/marcli.exe

@@ -21,13 +21,13 @@ type Leader struct {
 
 // NewLeader creates a Leader from the data in the MARC record.
 func NewLeader(bytes []byte) (Leader, error) {
-	if len(bytes) != 24 {
-		return Leader{}, errors.New("Incomplete leader")
+	if len(bytes) != leaderLength {
+		return Leader{}, errors.New("incomplete leader")
 	}
 
-	// A typical good leader value is: "01848nam  2200385 i 4500"
+	// A typical good leader value is: "01848nam a2200385 i 4500"
 	// where as a bad value would be.: "ZZZZZnamZa22ZZZZZzZZ4500"
-	offset, err := strconv.Atoi(string(bytes[12:17]))
+	offset, err := strconv.Atoi(string(bytes[offsetStart:offsetEnd]))
 	if err != nil {
 		msg := fmt.Sprintf("Could not determine data offset from leader (%s)", string(bytes))
 		err = errors.New(msg)
