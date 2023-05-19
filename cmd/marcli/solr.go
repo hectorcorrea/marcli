@@ -19,15 +19,15 @@ type SolrDocument struct {
 	AuthorsOther    []string `json:"authors_other_txts_en,omitempty"`
 	Title           string   `json:"title_txt_en,omitempty"`
 	Responsibility  string   `json:"responsibility_txt_en,omitempty"`
-	PublisherPlace  string   `json:"publisher_place_str,omitempty"`
-	PublisherName   string   `json:"publisher_name_str,omitempty"`
-	PublisherDate   string   `json:"publisher_date_str,omitempty"`
+	PublisherPlace  string   `json:"publisher_place_s,omitempty"`
+	PublisherName   string   `json:"publisher_name_s,omitempty"`
+	PublisherDate   string   `json:"publisher_date_s,omitempty"`
 	Urls            []string `json:"urls_ss,omitempty"`
-	Subjects        []string `json:"subjects_txts_en,omitempty"`
-	SubjectsForm    []string `json:"subjects_form_txts_en,omitempty"`
-	SubjectsGeneral []string `json:"subjects_general_txts_en,omitempty"`
-	SubjectsChrono  []string `json:"subjects_chrono_txts_en,omitempty"`
-	SubjectsGeo     []string `json:"subjects_geo_txts_en,omitempty"`
+	Subjects        []string `json:"subjects_ss,omitempty"`
+	SubjectsForm    []string `json:"subjects_form_ss,omitempty"`
+	SubjectsGeneral []string `json:"subjects_general_ss,omitempty"`
+	SubjectsChrono  []string `json:"subjects_chrono_ss,omitempty"`
+	SubjectsGeo     []string `json:"subjects_geo_ss,omitempty"`
 }
 
 func NewSolrDocument(r marc.Record) SolrDocument {

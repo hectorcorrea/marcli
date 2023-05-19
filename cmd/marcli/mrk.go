@@ -8,6 +8,8 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
+// Mnemonic MARC, a human readable version
+// See: https://librarycarpentry.org/lc-marcedit/03-working-with-MARC-files.html
 func toMrk(params ProcessFileParams) error {
 	if count == 0 {
 		return nil
