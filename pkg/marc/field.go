@@ -7,19 +7,27 @@ import (
 	"strings"
 )
 
+var (
+	ErrInvalidIndicators  = errors.New("invalid Indicators detected")
+	ErrBadSubfieldsLength = errors.New("bad SubFields length")
+)
+
 // Field represents a field inside a MARC record. Notice that the
 // field could be a "control" field (tag 001-009) or a "data" field
 // (any other tag)
 //
 // For example in:
-//		=650  \0$aDiabetes$xComplications$zUnited States.
+//
+//	=650  \0$aDiabetes$xComplications$zUnited States.
+//
 // Field would be:
-// 		Field{
+//
+//		Field{
 //			Tag: "650",
 //			Value: ""
 //			Indicator1: " ",
 //			Indicator2: "0",
-//			SubFields (see SubField definition above)
+//			SubFields (see SubField definition below)
 //	}
 type Field struct {
 	Tag        string     // for both Control and Data fields
@@ -31,18 +39,21 @@ type Field struct {
 
 // SubField contains a Code and a Value.
 // For example in:
-//		=650  \0$aDiabetes$xComplications$zUnited States.
+//
+//	=650  \0$aDiabetes$xComplications$zUnited States.
+//
 // an example of SubFieldValue will be:
-// 		SubField{
-//			Code: "a",
-//			Value: "Diabetes"
-//		}
+//
+//	SubField{
+//		Code: "a",
+//		Value: "Diabetes"
+//	}
 type SubField struct {
 	Code  string
 	Value string
 }
 
-// MakeField creates a field objet with the data received.
+// MakeField creates a field object with the data received.
 func MakeField(tag string, data []byte) (Field, error) {
 	f := Field{}
 	f.Tag = tag
@@ -57,11 +68,11 @@ func MakeField(tag string, data []byte) (Field, error) {
 		f.Indicator1 = string(data[0])
 		f.Indicator2 = string(data[1])
 	} else {
-		return f, errors.New("Invalid Indicators detected")
+		return f, ErrInvalidIndicators
 	}
 
 	if len(data) < 4 { // Each data field contains at least one subfield code.
-		return f, errors.New("Bad SubFields length")
+		return f, ErrBadSubfieldsLength
 	}
 
 	for _, sf := range bytes.Split(data[3:], []byte{st}) {

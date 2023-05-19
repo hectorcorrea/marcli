@@ -72,7 +72,7 @@ func (r Record) DebugString() string {
 		str += fmt.Sprintf("%s\r\n", field)
 	}
 	str += "BINARY:\n"
-	str += fmt.Sprintf("%s", r.Data)
+	str += string(r.Data)
 	return str
 }
 
