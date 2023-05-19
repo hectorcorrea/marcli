@@ -56,7 +56,7 @@ You can also filter based on the presence of certain fields in the MARC record (
 ./marcli -file data/test_10.mrc -hasFields 110
 ```
 
-The program supports a `format` parameter to output to other formats other than MARC line delimited (MRK) such as MARC XML, JSON, or MARC binary. Notice that not all the features are available in all the formats yet.
+By default the output is in Mnemonic MARC (`.mrk`), which is a human readable format. You can use the `format` parameter to output MARC XML, MARC JSON, or MARC binary instead. Notice that not all the features are available in all the formats.
 
 You can also pass `start` and `count` parameters to output only a range of MARC records.
 
