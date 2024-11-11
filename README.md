@@ -5,7 +5,7 @@ The goal of `marcli` is to allow a user to parse large MARC files in either MARC
 
 
 ## Installation
-On the Mac or Linux the easiest way to install `marcli` is via Homebrew:
+On the Mac or Linux the easiest way to install `marcli` is via Homebrew (thank you [Eric Phetteplace](https://github.com/phette23)):
 
 ```
 brew install marcli
