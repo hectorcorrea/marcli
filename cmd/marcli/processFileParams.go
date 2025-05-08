@@ -7,7 +7,9 @@ import (
 type ProcessFileParams struct {
 	filename     string
 	searchValue  string
+	searchRegEx  string
 	searchFields []string
+	format       string
 	filters      marc.FieldFilters
 	exclude      marc.FieldFilters
 	start        int

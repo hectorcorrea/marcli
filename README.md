@@ -58,6 +58,8 @@ You can also filter based on the presence of certain fields in the MARC record (
 
 By default the output is in Mnemonic MARC (`.mrk`), which is a human readable format. You can use the `format` parameter to output MARC XML, MARC JSON, or MARC binary instead. Notice that not all the features are available in all the formats.
 
+You can use `count-only` as the `format` if you only want a count of the number of records on the file. If you use the `match` parameter it will report only the number of records that match the criteria.
+
 You can also pass `start` and `count` parameters to output only a range of MARC records.
 
 

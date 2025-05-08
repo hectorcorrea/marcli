@@ -89,7 +89,15 @@ func (f Field) IsControlField() bool {
 }
 
 // Contains returns true if the field contains the passed string.
-func (f Field) Contains(str string) bool {
+func (f Field) Contains(str string, regEx string) bool {
+	if str != "" {
+		return f.containsValue(str)
+	} else {
+		return f.containsRegEx(regEx)
+	}
+}
+
+func (f Field) containsValue(str string) bool {
 	str = strings.ToLower(str)
 	if f.IsControlField() {
 		return strings.Contains(strings.ToLower(f.Value), str)
@@ -100,6 +108,15 @@ func (f Field) Contains(str string) bool {
 			return true
 		}
 	}
+	return false
+}
+
+func (f Field) containsRegEx(regEx string) bool {
+	// TODO: implement the regex search
+	// re := regexp.MustCompile(regEx)
+	// matches := re.FindStringSubmatch(search)
+	// fmt.Printf("%#v\r\n", matches)
+	panic("regex search has not been implemented")
 	return false
 }
 

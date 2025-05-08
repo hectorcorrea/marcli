@@ -42,7 +42,7 @@ func toJson(params ProcessFileParams) error {
 		if i++; i < start {
 			continue
 		}
-		if r.Contains(params.searchValue, params.searchFields) && r.HasFields(params.hasFields) {
+		if r.Contains(params.searchValue, params.searchRegEx, params.searchFields) && r.HasFields(params.hasFields) {
 			if out > 0 {
 				fmt.Printf(",\r\n")
 			} else {

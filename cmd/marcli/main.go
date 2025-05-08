@@ -9,17 +9,18 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
-var fileName, search, searchFields, fields, exclude, format, hasFields string
+var fileName, search, searchRegEx, searchFields, fields, exclude, format, hasFields string
 var start, count int
 var debug bool
 
 func init() {
 	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
 	flag.StringVar(&search, "match", "", "String that must be present in the content of the record, case insensitive.")
+	flag.StringVar(&searchRegEx, "matchRegEx", "", "A regular expression to match the record.")
 	flag.StringVar(&searchFields, "matchFields", "", "Comma delimited list of fields to search, used when match parameter is indicated, defaults to all fields.")
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
 	flag.StringVar(&exclude, "exclude", "", "Comma delimited list of fields to exclude from the output.")
-	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, xml, json, or solr.")
+	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, xml, json, solr, or count-only.")
 	flag.IntVar(&start, "start", 1, "Number of first record to load")
 	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
 	flag.StringVar(&hasFields, "hasFields", "", "Comma delimited list of fields that must be present in the record.")
@@ -50,10 +51,10 @@ func main() {
 	}
 
 	var err error
-	if format == "mrc" {
-		err = toMrc(params)
-	} else if format == "mrk" {
+	if format == "mrk" || format == "count-only" {
 		err = toMrk(params)
+	} else if format == "mrc" {
+		err = toMrc(params)
 	} else if format == "json" {
 		err = toJson(params)
 	} else if format == "solr" {
@@ -61,7 +62,7 @@ func main() {
 	} else if format == "xml" {
 		err = toXML(params)
 	} else {
-		err = errors.New("Invalid format")
+		err = errors.New("invalid format")
 	}
 	if err != nil {
 		panic(err)

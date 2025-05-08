@@ -13,11 +13,11 @@ type Record struct {
 	Leader Leader
 }
 
-// Contains returns true if Record contains the value passed.
+// Contains returns true if Record contains the value passed or matches the regEx passed.
 // If searchFieldList is an empty array it searches in all fields for the record
 // otherwise the search is limited to only the fields in the array.
-func (r Record) Contains(searchValue string, searchFieldsList []string) bool {
-	if searchValue == "" {
+func (r Record) Contains(searchValue string, searchRegEx string, searchFieldsList []string) bool {
+	if searchValue == "" && searchRegEx == "" {
 		return true
 	}
 
@@ -33,7 +33,7 @@ func (r Record) Contains(searchValue string, searchFieldsList []string) bool {
 	}
 
 	for _, field := range searchFields {
-		if field.Contains(searchValue) {
+		if field.Contains(searchValue, searchRegEx) {
 			return true
 		}
 	}

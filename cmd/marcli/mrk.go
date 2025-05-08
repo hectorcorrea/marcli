@@ -21,7 +21,7 @@ func toMrk(params ProcessFileParams) error {
 	}
 	defer file.Close()
 
-	var i, out int
+	var i, out, recordCount int
 	marc := marc.NewMarcFile(file)
 	for marc.Scan() {
 
@@ -46,7 +46,8 @@ func toMrk(params ProcessFileParams) error {
 			continue
 		}
 
-		if r.Contains(params.searchValue, params.searchFields) && r.HasFields(params.hasFields) {
+		if r.Contains(params.searchValue, params.searchRegEx, params.searchFields) && r.HasFields(params.hasFields) {
+			recordCount += 1
 			str := ""
 			if params.filters.IncludeLeader() {
 				str += fmt.Sprintf("%s\r\n", r.Leader)
@@ -55,7 +56,10 @@ func toMrk(params ProcessFileParams) error {
 				str += fmt.Sprintf("%s\r\n", field)
 			}
 			if str != "" {
-				fmt.Printf("%s\r\n", str)
+				// Print the details of the record
+				if format == "mrk" {
+					fmt.Printf("%s\r\n", str)
+				}
 				if out++; out == count {
 					break
 				}
@@ -63,5 +67,9 @@ func toMrk(params ProcessFileParams) error {
 		}
 	}
 
+	// Print the count of records only
+	if format == "count-only" {
+		fmt.Printf("%d\r\n", recordCount)
+	}
 	return marc.Err()
 }
