@@ -57,7 +57,7 @@ func toMrk(params ProcessFileParams) error {
 			}
 			if str != "" {
 				// Print the details of the record
-				if format == "mrk" {
+				if params.format == "mrk" {
 					fmt.Printf("%s\r\n", str)
 				}
 				if out++; out == count {
@@ -68,7 +68,7 @@ func toMrk(params ProcessFileParams) error {
 	}
 
 	// Print the count of records only
-	if format == "count-only" {
+	if params.format == "count-only" {
 		fmt.Printf("%d\r\n", recordCount)
 	}
 	return marc.Err()

@@ -133,6 +133,7 @@ func TestContains(t *testing.T) {
 		name   string
 		input  Field
 		arg    string
+		regEx  string
 		result bool
 	}{
 		{
@@ -219,7 +220,8 @@ func TestContains(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.input.Contains(tt.arg) != tt.result {
+			// TODO: Add test for regEx searches
+			if tt.input.Contains(tt.arg, tt.regEx) != tt.result {
 				t.Errorf("expected Contains() call on %v to return %v for %v", tt.input, tt.result, tt.arg)
 			}
 		})

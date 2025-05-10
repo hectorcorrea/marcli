@@ -36,7 +36,9 @@ func main() {
 
 	params := ProcessFileParams{
 		filename:     fileName,
+		format:       format,
 		searchValue:  strings.ToLower(search),
+		searchRegEx:  searchRegEx,
 		searchFields: searchFieldsFromString(searchFields),
 		filters:      marc.NewFieldFilters(fields),
 		exclude:      marc.NewFieldFilters(exclude),
@@ -48,6 +50,10 @@ func main() {
 
 	if len(params.filters.Fields) > 0 && len(params.exclude.Fields) > 0 {
 		panic("Cannot specify fields and exclude at the same time.")
+	}
+
+	if params.searchValue != "" && params.searchRegEx != "" {
+		panic("Cannot specify match and matchRegEx at the same time.")
 	}
 
 	var err error
@@ -80,6 +86,9 @@ NOTES:
 By default marcli searches in all the fields for each record, you can use
 the matchFields parameter to limit the search to only certain fields (subfields
 are not supported in matchFields, i.e. 245 is OK, 245a is not)
+
+    The matchRegEx parameter can be used to filter records based on a regular expression
+(e.g. '.*03-\d\d-06.*' to get records with dates from March 2006)
 
     The hasFields parameter is used to filter records based on the presence
 of certain fields on the record (regardless of their value).

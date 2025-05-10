@@ -31,7 +31,8 @@ Output MARC data to the console in a line delimited format (`marcli` automatical
 ./marcli -file data/test_10.xml
 ```
 
-Extract MARC records on file that contain the string "wildlife"
+You can use the `-match` parameter to get only the records that match a given string, for example the code below extracts MARC records that contain the string "wildlife"
+
 ```
 ./marcli -file data/test_10.mrc -match wildlife
 ```
@@ -42,10 +43,16 @@ Extracts MARC records on file that contain the string "wildlife" but outputs onl
 ./marcli -file data/test_10.mrc -match wildlife -fields LDR,010,040,245a,650
 ```
 
+The `-matchRegEx` parameter can be used to pass a regular expression instead of a value to select the records that will be matched, for example the following will print only those records that have values that look like dates for March 2006 (03-\d\d-06):
+
+```
+./marcli -file data/test_10.xml -matchRegEx '.*03-\d\d-06.*'
+```
+
 The `-matchFields` parameter can be used to limit the fields where the match will be made:
 
 ```
-./marcli -file=data/test_10.mrc -match=web -matchFields=530
+./marcli -file data/test_10.mrc -match web -matchFields 530
 ````
 
 You can also use the `exclude` option to indicate fields to exclude from the output (notice that only full fields are supported here, e.g. 970 is accepted but not 970a)
