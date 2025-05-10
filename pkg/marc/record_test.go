@@ -16,6 +16,7 @@ func TestRecordContains(t *testing.T) {
 	containsTests := []struct {
 		name             string
 		searchValue      string
+		searchRegEx      string
 		searchFieldsList []string
 		result           bool
 	}{
@@ -28,7 +29,7 @@ func TestRecordContains(t *testing.T) {
 	}
 
 	for _, tt := range containsTests {
-		got := record.Contains(tt.searchValue, tt.searchFieldsList)
+		got := record.Contains(tt.searchValue, tt.searchRegEx, tt.searchFieldsList)
 		if !got == tt.result {
 			t.Errorf("expected record not to contain %q", tt.searchValue)
 		}

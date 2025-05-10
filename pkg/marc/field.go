@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -88,8 +89,16 @@ func (f Field) IsControlField() bool {
 	return strings.HasPrefix(f.Tag, "00")
 }
 
-// Contains returns true if the field contains the passed string.
-func (f Field) Contains(str string) bool {
+// Contains returns true if the field contains the passed string or matches the regex.
+func (f Field) Contains(str string, regEx string) bool {
+	if str != "" {
+		return f.containsValue(str)
+	} else {
+		return f.containsRegEx(regEx)
+	}
+}
+
+func (f Field) containsValue(str string) bool {
 	str = strings.ToLower(str)
 	if f.IsControlField() {
 		return strings.Contains(strings.ToLower(f.Value), str)
@@ -97,6 +106,27 @@ func (f Field) Contains(str string) bool {
 
 	for _, sub := range f.SubFields {
 		if strings.Contains(strings.ToLower(sub.Value), str) {
+			return true
+		}
+	}
+	return false
+}
+
+func (f Field) containsRegEx(regEx string) bool {
+	re := regexp.MustCompile(regEx)
+
+	if f.IsControlField() {
+		matches := re.FindStringSubmatch(f.Value)
+		// if matches != nil {
+		// 	fmt.Printf("Control field match %s: %#v\r\n", f.Tag, matches)
+		// }
+		return matches != nil
+	}
+
+	for _, sub := range f.SubFields {
+		matches := re.FindStringSubmatch(sub.Value)
+		if matches != nil {
+			// fmt.Printf("Field match %s: %#v\r\n", f.Tag, matches)
 			return true
 		}
 	}
