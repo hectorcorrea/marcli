@@ -79,7 +79,7 @@ func toXML(params ProcessFileParams) error {
 				}
 				panic(err)
 			}
-			fmt.Printf("%s\r\n", str)
+			fmt.Printf("%s%s", str, params.NewLine())
 			if out++; out == count {
 				break
 			}

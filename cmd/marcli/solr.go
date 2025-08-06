@@ -99,14 +99,14 @@ func toSolr(params ProcessFileParams) error {
 		}
 		if r.Contains(params.searchValue, params.searchRegEx, params.searchFields) && r.HasFields(params.hasFields) {
 			if out > 0 {
-				fmt.Printf(",\r\n")
+				fmt.Printf(",%s", params.NewLine())
 			} else {
-				fmt.Printf("\r\n")
+				fmt.Printf("%s", params.NewLine())
 			}
 			doc := NewSolrDocument(r)
 			b, err := json.Marshal(doc)
 			if err != nil {
-				fmt.Printf("%s\r\n", err)
+				fmt.Printf("%s%s", err, params.NewLine())
 			}
 			fmt.Printf("%s", b)
 			if out++; out == count {
@@ -114,7 +114,7 @@ func toSolr(params ProcessFileParams) error {
 			}
 		}
 	}
-	fmt.Printf("\r\n]\r\n")
+	fmt.Printf("%s]%s", params.NewLine(), params.NewLine())
 
 	return marc.Err()
 }

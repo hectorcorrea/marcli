@@ -123,7 +123,7 @@ func TestFieldFiltersString(t *testing.T) {
 
 	fieldFilters := FieldFilters{Fields: []FieldFilter{{Tag: "LDR", Subfields: ""}, {Tag: "245", Subfields: "ahc"}}}
 
-	want := "Filters {\r\n\tTag: LDR\r\n\tTag: 245 subfields: ahc\r\n}\r\n"
+	want := "Filters {\n\tTag: LDR\n\tTag: 245 subfields: ahc\n}\n"
 	got := fieldFilters.String()
 
 	if want != got {

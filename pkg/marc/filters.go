@@ -57,15 +57,15 @@ func NewFieldFilter(fieldStr string) (FieldFilter, error) {
 }
 
 func (filters FieldFilters) String() string {
-	s := "Filters {\r\n"
+	s := "Filters {\n"
 	for _, field := range filters.Fields {
 		if field.Subfields == "" {
-			s += fmt.Sprintf("\tTag: %s\r\n", field.Tag)
+			s += fmt.Sprintf("\tTag: %s\n", field.Tag)
 		} else {
-			s += fmt.Sprintf("\tTag: %s subfields: %s\r\n", field.Tag, field.Subfields)
+			s += fmt.Sprintf("\tTag: %s subfields: %s\n", field.Tag, field.Subfields)
 		}
 	}
-	s += "}\r\n"
+	s += "}\n"
 	return s
 }
 

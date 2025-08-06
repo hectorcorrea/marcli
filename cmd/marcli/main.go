@@ -9,7 +9,7 @@ import (
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
 
-var fileName, search, searchRegEx, searchFields, fields, exclude, format, hasFields string
+var fileName, search, searchRegEx, searchFields, fields, exclude, format, hasFields, newLine string
 var start, count int
 var debug bool
 
@@ -21,10 +21,11 @@ func init() {
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
 	flag.StringVar(&exclude, "exclude", "", "Comma delimited list of fields to exclude from the output.")
 	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, xml, json, solr, yaz, or count-only.")
-	flag.IntVar(&start, "start", 1, "Number of first record to load")
-	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit)")
+	flag.IntVar(&start, "start", 1, "Number of first record to load.")
+	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit).")
 	flag.StringVar(&hasFields, "hasFields", "", "Comma delimited list of fields that must be present in the record.")
-	flag.BoolVar(&debug, "debug", false, "When true it does not stop on errors")
+	flag.BoolVar(&debug, "debug", false, "When true it does not stop on errors.")
+	flag.StringVar(&newLine, "newLine", "LF", "Character(s) to use to indicate new lines. Valid values LF or CRLF.")
 	flag.Parse()
 }
 
@@ -46,6 +47,7 @@ func main() {
 		count:        count,
 		hasFields:    marc.NewFieldFilters(hasFields),
 		debug:        debug,
+		newLine:      newLine,
 	}
 
 	if len(params.filters.Fields) > 0 && len(params.exclude.Fields) > 0 {
@@ -78,10 +80,10 @@ func main() {
 }
 
 func showSyntax() {
-	fmt.Printf("marcli parameters:\r\n")
-	fmt.Printf("\r\n")
+	fmt.Println("marcli parameters:")
+	fmt.Println()
 	flag.PrintDefaults()
-	fmt.Printf("\r\n")
+	fmt.Println()
 	fmt.Printf(`
 NOTES:
 	The match parameter is used to filter records based on their content.
@@ -97,8 +99,8 @@ of certain fields on the record (regardless of their value).
 
 	You can only use the fields or exclude parameter, but not both.
 `)
-	fmt.Printf("\r\n")
-	fmt.Printf("\r\n")
+	fmt.Println()
+	fmt.Println()
 }
 
 func searchFieldsFromString(searchFieldsString string) []string {
