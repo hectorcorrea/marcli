@@ -118,7 +118,7 @@ func (f Field) containsRegEx(regEx string) bool {
 	if f.IsControlField() {
 		matches := re.FindStringSubmatch(f.Value)
 		// if matches != nil {
-		// 	fmt.Printf("Control field match %s: %#v\r\n", f.Tag, matches)
+		// 	fmt.Printf("Control field match %s: %#v\n", f.Tag, matches)
 		// }
 		return matches != nil
 	}
@@ -126,7 +126,7 @@ func (f Field) containsRegEx(regEx string) bool {
 	for _, sub := range f.SubFields {
 		matches := re.FindStringSubmatch(sub.Value)
 		if matches != nil {
-			// fmt.Printf("Field match %s: %#v\r\n", f.Tag, matches)
+			// fmt.Printf("Field match %s: %#v\n", f.Tag, matches)
 			return true
 		}
 	}
