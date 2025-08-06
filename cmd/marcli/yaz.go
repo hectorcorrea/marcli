@@ -50,20 +50,17 @@ func toYaz(params ProcessFileParams) error {
 			recordCount += 1
 			str := ""
 			if params.filters.IncludeLeader() {
-				//
-				// TODO use new params.NewLine() instead of \r\n
-				//
-				str += fmt.Sprintf("%s\r\n", r.Leader.Raw())
+				str += fmt.Sprintf("%s%s", r.Leader.Raw(), params.NewLine())
 			}
 			for _, field := range r.Filter(params.filters, params.exclude) {
 				if field.IsControlField() {
-					str += fmt.Sprintf("%s %s\r\n", field.Tag, field.Value)
+					str += fmt.Sprintf("%s %s%s", field.Tag, field.Value, params.NewLine())
 				} else {
 					str += fmt.Sprintf("%s %s%s ", field.Tag, field.Indicator1, field.Indicator2)
 					for _, sub := range field.SubFields {
 						str += fmt.Sprintf("$%s %s ", sub.Code, sub.Value)
 					}
-					str += "\r\n"
+					str += params.NewLine()
 				}
 			}
 			if str != "" {
