@@ -20,7 +20,7 @@ func init() {
 	flag.StringVar(&searchFields, "matchFields", "", "Comma delimited list of fields to search, used when match parameter is indicated, defaults to all fields.")
 	flag.StringVar(&fields, "fields", "", "Comma delimited list of fields to output.")
 	flag.StringVar(&exclude, "exclude", "", "Comma delimited list of fields to exclude from the output.")
-	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, xml, json, solr, or count-only.")
+	flag.StringVar(&format, "format", "mrk", "Output format. Accepted values: mrk, mrc, xml, json, solr, yaz, or count-only.")
 	flag.IntVar(&start, "start", 1, "Number of first record to load.")
 	flag.IntVar(&count, "count", -1, "Total number of records to load (-1 no limit).")
 	flag.StringVar(&hasFields, "hasFields", "", "Comma delimited list of fields that must be present in the record.")
@@ -69,6 +69,8 @@ func main() {
 		err = toSolr(params)
 	} else if format == "xml" {
 		err = toXML(params)
+	} else if format == "yaz" {
+		err = toYaz(params)
 	} else {
 		err = errors.New("invalid format")
 	}
