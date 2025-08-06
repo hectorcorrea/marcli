@@ -67,9 +67,9 @@ func (r Record) String() string {
 
 func (r Record) DebugString() string {
 	str := "PARSED:\n"
-	str += fmt.Sprintf("%s\r\n", r.Leader)
+	str += fmt.Sprintf("%s\n", r.Leader)
 	for _, field := range r.Fields {
-		str += fmt.Sprintf("%s\r\n", field)
+		str += fmt.Sprintf("%s\n", field)
 	}
 	str += "BINARY:\n"
 	str += string(r.Data)

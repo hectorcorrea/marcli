@@ -31,10 +31,10 @@ func toMrk(params ProcessFileParams) error {
 		}
 
 		if err != nil {
-			str := "== RECORD WITH ERROR STARTS HERE\n"
-			str += "ERROR:\n" + err.Error() + "\n"
-			str += r.DebugString() + "\n"
-			str += "== RECORD WITH ERROR ENDS HERE\n\n"
+			str := "== RECORD WITH ERROR STARTS HERE" + params.NewLine()
+			str += "ERROR:" + params.NewLine() + err.Error() + params.NewLine()
+			str += r.DebugString() + params.NewLine()
+			str += "== RECORD WITH ERROR ENDS HERE" + params.NewLine() + params.NewLine()
 			fmt.Print(str)
 			if params.debug {
 				continue
@@ -50,15 +50,15 @@ func toMrk(params ProcessFileParams) error {
 			recordCount += 1
 			str := ""
 			if params.filters.IncludeLeader() {
-				str += fmt.Sprintf("%s\r\n", r.Leader)
+				str += fmt.Sprintf("%s%s", r.Leader, params.NewLine())
 			}
 			for _, field := range r.Filter(params.filters, params.exclude) {
-				str += fmt.Sprintf("%s\r\n", field)
+				str += fmt.Sprintf("%s%s", field, params.NewLine())
 			}
 			if str != "" {
 				// Print the details of the record
 				if params.format == "mrk" {
-					fmt.Printf("%s\r\n", str)
+					fmt.Printf("%s%s", str, params.NewLine())
 				}
 				if out++; out == count {
 					break
@@ -69,7 +69,7 @@ func toMrk(params ProcessFileParams) error {
 
 	// Print the count of records only
 	if params.format == "count-only" {
-		fmt.Printf("%d\r\n", recordCount)
+		fmt.Printf("%d%s", recordCount, params.NewLine())
 	}
 	return marc.Err()
 }

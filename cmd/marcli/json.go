@@ -44,22 +44,21 @@ func toJson(params ProcessFileParams) error {
 		}
 		if r.Contains(params.searchValue, params.searchRegEx, params.searchFields) && r.HasFields(params.hasFields) {
 			if out > 0 {
-				fmt.Printf(",\r\n")
+				fmt.Printf(",%s", params.NewLine())
 			} else {
-				fmt.Printf("\r\n")
+				fmt.Printf("%s", params.NewLine())
 			}
 			b, err := json.Marshal(r.Filter(params.filters, params.exclude))
 			if err != nil {
-				fmt.Printf("%s\r\n", err)
+				fmt.Printf("%s%s", err, params.NewLine())
 			}
-			// fmt.Printf("{ \"record\": %s}\r\n", b)
 			fmt.Printf("%s", b)
 			if out++; out == count {
 				break
 			}
 		}
 	}
-	fmt.Printf("\r\n]\r\n")
+	fmt.Printf("%s]%s", params.NewLine(), params.NewLine())
 
 	return marc.Err()
 }
