@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/hectorcorrea/marcli/pkg/marc"
 )
@@ -57,14 +58,15 @@ func toYaz(params ProcessFileParams) error {
 					str += fmt.Sprintf("%s %s%s", field.Tag, field.Value, params.NewLine())
 				} else {
 					str += fmt.Sprintf("%s %s%s ", field.Tag, field.Indicator1, field.Indicator2)
+					subfieldValues := ""
 					for _, sub := range field.SubFields {
-						str += fmt.Sprintf("$%s %s ", sub.Code, sub.Value)
+						subfieldValues += fmt.Sprintf("$%s %s ", sub.Code, sub.Value)
 					}
-					str += params.NewLine()
+					str += strings.TrimRight(subfieldValues, " ") + params.NewLine()
 				}
 			}
 			if str != "" {
-				fmt.Printf("%s", str)
+				fmt.Printf("%s%s", str, params.NewLine())
 				if out++; out == count {
 					break
 				}
