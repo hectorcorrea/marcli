@@ -13,6 +13,12 @@ var fileName, search, searchRegEx, searchFields, fields, exclude, format, hasFie
 var start, count int
 var debug bool
 
+// The Version value is set at compile time via Go's `ldflags` parameter
+// See https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications
+//
+// go build -ldflags="-X 'main.Version=v1.0.0'"
+var Version = ""
+
 func init() {
 	flag.StringVar(&fileName, "file", "", "MARC file to process. Required.")
 	flag.StringVar(&search, "match", "", "String that must be present in the content of the record, case insensitive.")
@@ -80,12 +86,12 @@ func main() {
 }
 
 func showSyntax() {
-	fmt.Println("marcli parameters:")
-	fmt.Println()
+	fmt.Printf("marcli %s\n\n", Version)
+	fmt.Println("Parameters:")
 	flag.PrintDefaults()
 	fmt.Println()
 	fmt.Printf(`
-NOTES:
+Notes:
 	The match parameter is used to filter records based on their content.
 By default marcli searches in all the fields for each record, you can use
 the matchFields parameter to limit the search to only certain fields (subfields
